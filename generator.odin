@@ -20,19 +20,8 @@ main :: proc() {
 		return
 	}
 
-	builder := strings.builder_make()
-	gen_file_start(&builder)
-
-	// Handle top level elements
-	for id in doc.elements[0].children {
-		el := doc.elements[id]
-		if el.ident == "enums" {
-			gen_enums(&builder, doc, el)
-		}
-	}
-
-	// Write the resulting file
-	os.write_entire_file("openxr/xr.odin", builder.buf[:])
+	gen_core_odin(doc)
+	gen_enums_odin(doc)
 }
 
 el_get_attrib :: proc(el: xml.Element, key: string) -> string {
@@ -57,15 +46,113 @@ gen_file_start :: proc(builder: ^strings.Builder) {
 	strings.write_string(builder, "Flags64 :: distinct u64\n\n")
 }
 
+CORE_HELPERS :: `
+// Version helpers
+CURRENT_API_VERSION :: (1<<48) | (0<<12) | (32)
+MAKE_VERSION :: proc(major, minor, patch: u64) -> u64 {
+    return (major<<48) | (minor<<32) | (patch)
+}
+
+// Base types
+Flags64 :: distinct u64
+Handle  :: distinct rawptr
+Atom    :: distinct u64
+
+SetProcAddressType :: #type proc(p: rawptr, name: cstring)
+
+`
+
+// Generates the full core.odin file and writes it out
+gen_core_odin :: proc(doc: ^xml.Document) {
+	builder := strings.builder_make()
+	strings.write_string(&builder, "package openxr\n\n")
+	strings.write_string(&builder, CORE_HELPERS)
+
+	for id in doc.elements[0].children {
+		el := doc.elements[id]
+		el_name, ok := el_try_get_attrib(el, "name")
+		if el.ident != "enums" || el_name != "API Constants" {continue}
+		gen_constants(&builder, doc, el)
+	}
+
+	for id in doc.elements[0].children {
+		el := doc.elements[id]
+		if el.ident != "extensions" {continue}
+		gen_extension_constants(&builder, doc, el)
+	}
+
+	os.write_entire_file("openxr/core.odin", builder.buf[:])
+}
+
+// Generates odin constants from the "API Constants" <enums> element
+gen_constants :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	strings.write_string(builder, "// Base constants\n\n")
+
+	for child in el.children {
+		gen_constant(builder, doc, doc.elements[child])
+	}
+	strings.write_string(builder, "\n\n")
+}
+
+// Generate an odin constant from an <enum>
+gen_constant :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	full_name := el_get_attrib(el, "name")
+	name := strings.trim_prefix(full_name, "XR_")
+	value := el_get_attrib(el, "value")
+
+	if name == "TRUE" || name == "FALSE" {
+		return
+	}
+
+	strings.write_string(builder, fmt.aprintln(name, "::", value))
+}
+
+// Generates odin constants from the <extensions> element
+gen_extension_constants :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	strings.write_string(builder, "// Extension constants\n\n")
+
+	for child in el.children {
+		gen_extension_constant(builder, doc, doc.elements[child])
+	}
+	strings.write_string(builder, "\n\n")
+}
+
+// Generates odin constants from the <extensions> element
+gen_extension_constant :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	full_name := el_get_attrib(el, "name")
+	name := strings.trim_prefix(full_name, "XR_")
+	number := el_get_attrib(el, "number")
+	spec_element := doc.elements[doc.elements[el.children[0]].children[0]]
+	spec_version := el_get_attrib(spec_element, "value")
+	screaming_name := strings.to_screaming_snake_case(name)
+
+	strings.write_string(builder, fmt.aprintf("{} :: {}\n", name, number))
+	strings.write_string(builder, fmt.aprintf("{}_SPEC_VERSION :: {}\n", screaming_name, spec_version))
+	strings.write_string(builder, fmt.aprintf("{}_EXTENSION_NAME :: \"{}\"\n", screaming_name, full_name))
+}
+
+
+// Generates the full enums.odin file and writes it out
+gen_enums_odin :: proc(doc: ^xml.Document) {
+	builder := strings.builder_make()
+	strings.write_string(&builder, "package openxr\n\n")
+	strings.write_string(&builder, "import \"core:c\"\n\n")
+
+	for id in doc.elements[0].children {
+		el := doc.elements[id]
+		if el.ident != "enums" {continue}
+		gen_enums(&builder, doc, el)
+	}
+
+	os.write_entire_file("openxr/enums.odin", builder.buf[:])
+}
+
 // Generates odin code from an <enums> element
 gen_enums :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
 	el_name := el_get_attrib(el, "name")
 
 	// Handle API Constants special case
-	if el_name == "API Constants" {
-		gen_enums_constants(builder, doc, el)
-		return
-	}
+	if el_name == "API Constants" {return}
 
 	// Handle actual enums
 	el_type := el_get_attrib(el, "type")
@@ -80,28 +167,6 @@ gen_enums :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element
 	panic(fmt.tprintln("Unknown <enums> of type", el_type))
 }
 
-// Generates odin constants from the "API Constants" <enums> element
-gen_enums_constants :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
-	strings.write_string(builder, "// Constants\n\n")
-
-	for child in el.children {
-		gen_enums_constant(builder, doc, doc.elements[child])
-	}
-	strings.write_string(builder, "\n\n")
-}
-
-// Generate an odin constant from an <enum>
-gen_enums_constant :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
-	full_name := el_get_attrib(el, "name")
-	name := strings.trim_prefix(full_name, "XR_")
-	value := el_get_attrib(el, "value")
-
-	if name == "TRUE" || name == "FALSE" {
-		return
-	}
-
-	strings.write_string(builder, fmt.aprintln(name, "::", value))
-}
 
 // Generates an odin enum type from an <enums> element of type="enum"
 gen_enums_enum :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
