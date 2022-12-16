@@ -20,6 +20,9 @@ main :: proc() {
 		return
 	}
 
+	// TODO: Prepass in enums, build dict of all extended enums to get full definitions
+	// Handle XrSwapchainUsageFlagBits special case (only vendor extended bitmask)
+
 	gen_core_odin(doc)
 	gen_enums_odin(doc)
 	gen_structs_odin(doc)
@@ -328,10 +331,92 @@ bitfield_name_to_prefix_suffix :: proc(name: string) -> (string, string) {
 //                                               STRUCTS.ODIN                                                              //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+OS_TYPES :: `
+import "core:c"
+
+// Vulkan Types
+import vk "vendor:vulkan"
+
+// OpenGL Types
+EGLenum :: c.int
+
+// Windows specific OS / API types
+when ODIN_OS == .Windows {
+	import win32 "core:sys/windows"
+        HDC :: win32.HDC
+        HGLRC :: win32.HGLRC
+	LUID  :: win32.LUID
+        IUnknown :: win32.IUnknown
+
+        D3D_FEATURE_LEVEL :: c.int
+
+        import D3D11 "vendor:directx/d3d11"
+        ID3D11Device :: D3D11.IDevice
+        ID3D11Texture2D :: D3D11.ITexture2D
+        
+        import D3D12 "vendor:directx/d3d12"
+        ID3D12Device :: D3D12.IDevice
+        ID3D12CommandQueue :: D3D12.ICommandQueue
+        ID3D12Resource :: D3D12.IResource
+} else {
+        HDC :: distinct rawptr
+        HGLRC :: distinct rawptr
+	LUID   :: struct {
+		LowPart:  DWORD,
+		HighPart: LONG,
+	}
+        IUnknown :: distinct rawptr
+
+        D3D_FEATURE_LEVEL :: c.int
+        
+        ID3D11Device :: distinct rawptr
+        ID3D11Texture2D :: distinct rawptr
+        
+        ID3D12Device :: distinct rawptr
+        ID3D12CommandQueue :: distinct rawptr
+        ID3D12Resource :: distinct rawptr
+}
+
+`
+
+// Mapping from C to odin type names
+TYPE_ALIASES := map[string]string {
+	"float"    = "f32",
+	"double"   = "f64",
+	"int8_t"   = "i8",
+	"int16_t"  = "i16",
+	"int32_t"  = "i32",
+	"int64_t"  = "i64",
+	"uint8_t"  = "u8",
+	"uint16_t" = "u16",
+	"uint32_t" = "u32",
+	"uint64_t" = "u64",
+	"XrBool32" = "b32",
+	"int"      = "c.int",
+	"char"     = "u8",
+}
+
+// Mapping from C to odin type names
+NAME_ALIASES := map[string]string {
+	"type"    = "sType",
+	"context" = "ctx",
+	"dynamic" = "fovDynamic",
+}
+
+UNSUPPORTED_STRUCTS :: [?]string{
+	"XrGraphicsBindingOpenGLXlibKHR",
+	"XrGraphicsBindingOpenGLXcbKHR",
+	"XrGraphicsBindingOpenGLWaylandKHR",
+	"XrGraphicsBindingOpenGLESAndroidKHR",
+	"XrGraphicsBindingEGLMNDX",
+}
+
 // Generates the full enums.odin file and writes it out
 gen_structs_odin :: proc(doc: ^xml.Document) {
 	builder := strings.builder_make()
 	strings.write_string(&builder, "package openxr\n\n")
+
+	strings.write_string(&builder, OS_TYPES)
 
 	for id in doc.elements[0].children {
 		el := doc.elements[id]
@@ -343,16 +428,80 @@ gen_structs_odin :: proc(doc: ^xml.Document) {
 }
 
 gen_struct_types :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
-        for id in el.children {
-                el := doc.elements[id]
-                category, _ := el_try_get_attrib(el, "category")
-                if category != "struct" {continue}
-                gen_struct_type(builder, doc, el)
-        }
+	for id in el.children {
+		el := doc.elements[id]
+		category, _ := el_try_get_attrib(el, "category")
+		if category != "struct" {continue}
+		gen_struct_type(builder, doc, el)
+	}
 }
 
 gen_struct_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
-        fmt.println(el_get_attrib(el, "name"))
+	full_name := el_get_attrib(el, "name")
+	for unsupported in UNSUPPORTED_STRUCTS {
+		if full_name == unsupported {return}
+	}
+
+	name := strings.trim_left(full_name, "Xr")
+
+	strings.write_string(builder, fmt.aprintf("{} :: struct {{\n", name))
+
+	for id in el.children {
+		gen_struct_member(builder, doc, doc.elements[id])
+	}
+
+	strings.write_string(builder, "}\n\n")
+}
+
+gen_struct_member :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	if el.ident != "member" {return}
+
+	type_str := doc.elements[el.children[0]].value
+	name_str := doc.elements[el.children[1]].value
+
+	// Apply alias and trim Xr prefix
+	if type_str in TYPE_ALIASES {
+		type_str = TYPE_ALIASES[type_str]
+	}
+	type_str = strings.trim_prefix(type_str, "Xr")
+	if strings.has_prefix(type_str, "PFN_xr") {
+		type_str = strings.trim_prefix(type_str, "PFN_xr")
+		type_str = fmt.aprintf("Proc{}", type_str)
+	}
+
+	// Handle Vk prefixes
+	if strings.has_prefix(type_str, "Vk") {
+		type_str = strings.trim_prefix(type_str, "Vk")
+		type_str = fmt.aprintf("vk.{}", type_str)
+	}
+	if strings.has_prefix(type_str, "PFN_vk") {
+		type_str = strings.trim_prefix(type_str, "PFN_vk")
+		type_str = fmt.aprintf("vk.Proc{}", type_str)
+	}
+
+	// This will have pointer / array characters
+	ptr_count := strings.count(el.value, "*")
+	if ptr_count == 1 {
+		type_str = fmt.aprintf("^{}", type_str)
+	}
+	if ptr_count == 2 {
+		type_str = fmt.aprintf("^^{}", type_str)
+	}
+
+	// Now handle void pointers
+	if type_str == "^void" {
+		type_str = "rawptr"
+	}
+	if type_str == "^^void" {
+		type_str = "^rawptr"
+	}
+
+	// Alias reserved words
+	if name_str in NAME_ALIASES {
+		name_str = NAME_ALIASES[name_str]
+	}
+
+	strings.write_string(builder, fmt.aprintf("\t{} : {},\n", name_str, type_str))
 }
 
 
@@ -375,11 +524,11 @@ gen_procedures_odin :: proc(doc: ^xml.Document) {
 }
 
 gen_procedures :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
-        for id in el.children {
-                el := doc.elements[id]
-                if el.ident != "command" {continue}
-                gen_procedure(builder, doc, el)
-        }
+	for id in el.children {
+		el := doc.elements[id]
+		if el.ident != "command" {continue}
+		gen_procedure(builder, doc, el)
+	}
 }
 
 gen_procedure :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
