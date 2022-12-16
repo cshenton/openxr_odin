@@ -20,8 +20,22 @@ main :: proc() {
 		return
 	}
 
+	// Prepass extensions info
+	// TODO: Get Constants from extensions
 	// TODO: Prepass in enums, build dict of all extended enums to get full definitions
-	// Handle XrSwapchainUsageFlagBits special case (only vendor extended bitmask)
+	// TODO: Handle XrSwapchainUsageFlagBits special case (only vendor extended bitmask)
+
+	// Get struct arrays
+	// TODO: Parse struct fields for arrayness and length
+	
+	// Generate functions
+	// TODO: Generate dummy function pointer types
+	// TODO: Generate function signatures
+	// TODO: Generate CreateFooBar : ProcCreateFooBar members
+	
+	// Write loader
+	// TODO: Link GetInstanceProcAddress
+	// TODO: Gather all instance, device functions and write procs to load in fn pointers
 
 	gen_core_odin(doc)
 	gen_enums_odin(doc)
