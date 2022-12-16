@@ -22,6 +22,8 @@ main :: proc() {
 
 	gen_core_odin(doc)
 	gen_enums_odin(doc)
+	gen_structs_odin(doc)
+	gen_procedures_odin(doc)
 }
 
 el_get_attrib :: proc(el: xml.Element, key: string) -> string {
@@ -40,23 +42,31 @@ el_try_get_attrib :: proc(el: xml.Element, key: string) -> (string, bool) {
 	return "", false
 }
 
-gen_file_start :: proc(builder: ^strings.Builder) {
-	strings.write_string(builder, "package openxr\n\n")
-	strings.write_string(builder, "import \"core:c\"\n\n")
-	strings.write_string(builder, "Flags64 :: distinct u64\n\n")
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                               CORE.ODIN                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CORE_HELPERS :: `
-// Version helpers
+// Version Helpers
 CURRENT_API_VERSION :: (1<<48) | (0<<12) | (32)
 MAKE_VERSION :: proc(major, minor, patch: u64) -> u64 {
     return (major<<48) | (minor<<32) | (patch)
 }
 
-// Base types
-Flags64 :: distinct u64
-Handle  :: distinct rawptr
-Atom    :: distinct u64
+// Base Types
+Handle          :: distinct rawptr
+Atom            :: distinct u64
+Flags64         :: distinct u64
+Time            :: i64
+Duration        :: i64
+Version         :: u64
+
+// Atom Types
+Path                    :: distinct Atom
+SystemId                :: distinct Atom
+ControllerModelKeyMSFT  :: distinct Atom
+AsyncRequestIdFB        :: distinct Atom
+RenderModelKeyFB        :: distinct Atom
 
 SetProcAddressType :: #type proc(p: rawptr, name: cstring)
 
@@ -65,7 +75,7 @@ SetProcAddressType :: #type proc(p: rawptr, name: cstring)
 // Generates the full core.odin file and writes it out
 gen_core_odin :: proc(doc: ^xml.Document) {
 	builder := strings.builder_make()
-	strings.write_string(&builder, "package openxr\n\n")
+	strings.write_string(&builder, "package openxr\n")
 	strings.write_string(&builder, CORE_HELPERS)
 
 	for id in doc.elements[0].children {
@@ -73,6 +83,12 @@ gen_core_odin :: proc(doc: ^xml.Document) {
 		el_name, ok := el_try_get_attrib(el, "name")
 		if el.ident != "enums" || el_name != "API Constants" {continue}
 		gen_constants(&builder, doc, el)
+	}
+
+	for id in doc.elements[0].children {
+		el := doc.elements[id]
+		if el.ident != "types" {continue}
+		gen_core_types(&builder, doc, el)
 	}
 
 	for id in doc.elements[0].children {
@@ -86,12 +102,12 @@ gen_core_odin :: proc(doc: ^xml.Document) {
 
 // Generates odin constants from the "API Constants" <enums> element
 gen_constants :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
-	strings.write_string(builder, "// Base constants\n\n")
+	strings.write_string(builder, "// Base constants\n")
 
 	for child in el.children {
 		gen_constant(builder, doc, doc.elements[child])
 	}
-	strings.write_string(builder, "\n\n")
+	strings.write_string(builder, "\n")
 }
 
 // Generate an odin constant from an <enum>
@@ -107,14 +123,31 @@ gen_constant :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Elem
 	strings.write_string(builder, fmt.aprintln(name, "::", value))
 }
 
+// Generates odin constants from the "API Constants" <enums> element
+gen_core_types :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	strings.write_string(builder, "// Handle Types\n")
+
+	for child in el.children {
+		elem := doc.elements[child]
+		category, _ := el_try_get_attrib(elem, "category")
+		if category != "handle" {continue}
+
+		full_name := doc.elements[elem.children[1]].value
+		name := strings.trim_left(full_name, "Xr")
+		strings.write_string(builder, fmt.aprintf("{} :: distinct Handle\n", name))
+	}
+
+	strings.write_string(builder, "\n")
+}
+
 // Generates odin constants from the <extensions> element
 gen_extension_constants :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
-	strings.write_string(builder, "// Extension constants\n\n")
+	strings.write_string(builder, "// Extension constants\n")
 
 	for child in el.children {
 		gen_extension_constant(builder, doc, doc.elements[child])
 	}
-	strings.write_string(builder, "\n\n")
+	strings.write_string(builder, "\n")
 }
 
 // Generates odin constants from the <extensions> element
@@ -131,6 +164,9 @@ gen_extension_constant :: proc(builder: ^strings.Builder, doc: ^xml.Document, el
 	strings.write_string(builder, fmt.aprintf("{}_EXTENSION_NAME :: \"{}\"\n", screaming_name, full_name))
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                               ENUMS.ODIN                                                                //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Generates the full enums.odin file and writes it out
 gen_enums_odin :: proc(doc: ^xml.Document) {
@@ -285,4 +321,66 @@ bitfield_name_to_prefix_suffix :: proc(name: string) -> (string, string) {
 	prefix = fmt.aprintf("{}_", strings.to_screaming_snake_case(prefix))
 	suffix = suffix == "" ? "_BIT" : fmt.aprintf("_BIT_{}", suffix)
 	return prefix, suffix
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                               STRUCTS.ODIN                                                              //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Generates the full enums.odin file and writes it out
+gen_structs_odin :: proc(doc: ^xml.Document) {
+	builder := strings.builder_make()
+	strings.write_string(&builder, "package openxr\n\n")
+
+	for id in doc.elements[0].children {
+		el := doc.elements[id]
+		if el.ident != "types" {continue}
+		gen_struct_types(&builder, doc, el)
+	}
+
+	os.write_entire_file("openxr/structs.odin", builder.buf[:])
+}
+
+gen_struct_types :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+        for id in el.children {
+                el := doc.elements[id]
+                category, _ := el_try_get_attrib(el, "category")
+                if category != "struct" {continue}
+                gen_struct_type(builder, doc, el)
+        }
+}
+
+gen_struct_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+        fmt.println(el_get_attrib(el, "name"))
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                               PROCEDURES.ODIN                                                           //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Generates the full enums.odin file and writes it out
+gen_procedures_odin :: proc(doc: ^xml.Document) {
+	builder := strings.builder_make()
+	strings.write_string(&builder, "package openxr\n\n")
+
+	for id in doc.elements[0].children {
+		el := doc.elements[id]
+		if el.ident != "commands" {continue}
+		gen_procedures(&builder, doc, el)
+	}
+
+	os.write_entire_file("openxr/procedures.odin", builder.buf[:])
+}
+
+gen_procedures :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+        for id in el.children {
+                el := doc.elements[id]
+                if el.ident != "command" {continue}
+                gen_procedure(builder, doc, el)
+        }
+}
+
+gen_procedure :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
 }

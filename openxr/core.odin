@@ -1,21 +1,29 @@
 package openxr
 
-
-// Version helpers
+// Version Helpers
 CURRENT_API_VERSION :: (1<<48) | (0<<12) | (32)
 MAKE_VERSION :: proc(major, minor, patch: u64) -> u64 {
     return (major<<48) | (minor<<32) | (patch)
 }
 
-// Base types
-Flags64 :: distinct u64
-Handle  :: distinct rawptr
-Atom    :: distinct u64
+// Base Types
+Handle          :: distinct rawptr
+Atom            :: distinct u64
+Flags64         :: distinct u64
+Time            :: i64
+Duration        :: i64
+Version         :: u64
+
+// Atom Types
+Path                    :: distinct Atom
+SystemId                :: distinct Atom
+ControllerModelKeyMSFT  :: distinct Atom
+AsyncRequestIdFB        :: distinct Atom
+RenderModelKeyFB        :: distinct Atom
 
 SetProcAddressType :: #type proc(p: rawptr, name: cstring)
 
 // Base constants
-
 MAX_EXTENSION_NAME_SIZE :: 128
 MAX_API_LAYER_NAME_SIZE :: 256
 MAX_API_LAYER_DESCRIPTION_SIZE :: 256
@@ -32,9 +40,29 @@ MAX_ACTION_NAME_SIZE :: 64
 MAX_LOCALIZED_ACTION_SET_NAME_SIZE :: 128
 MAX_LOCALIZED_ACTION_NAME_SIZE :: 128
 
+// Handle Types
+Instance :: distinct Handle
+Session :: distinct Handle
+ActionSet :: distinct Handle
+Action :: distinct Handle
+Swapchain :: distinct Handle
+Space :: distinct Handle
+DebugUtilsMessengerEXT :: distinct Handle
+SpatialAnchorMSFT :: distinct Handle
+HandTrackerEXT :: distinct Handle
+FoveationProfileFB :: distinct Handle
+TriangleMeshFB :: distinct Handle
+PassthroughFB :: distinct Handle
+PassthroughLayerFB :: distinct Handle
+GeometryInstanceFB :: distinct Handle
+FacialTrackerHTC :: distinct Handle
+PassthroughHTC :: distinct Handle
+SpatialGraphNodeBindingMSFT :: distinct Handle
+SceneObserverMSFT :: distinct Handle
+SceneMSFT :: distinct Handle
+SpatialAnchorStoreConnectionMSFT :: distinct Handle
 
 // Extension constants
-
 KHR_android_thread_settings :: 4
 KHR_ANDROID_THREAD_SETTINGS_SPEC_VERSION :: 5
 KHR_ANDROID_THREAD_SETTINGS_EXTENSION_NAME :: "XR_KHR_android_thread_settings"
@@ -1280,5 +1308,4 @@ DANWILLM_EXTENSION_425_EXTENSION_NAME :: "XR_DANWILLM_extension_425"
 DANWILLM_extension_426 :: 426
 DANWILLM_EXTENSION_426_SPEC_VERSION :: 1
 DANWILLM_EXTENSION_426_EXTENSION_NAME :: "XR_DANWILLM_extension_426"
-
 
