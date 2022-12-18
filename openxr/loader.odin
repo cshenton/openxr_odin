@@ -180,6 +180,8 @@ load_instance_procs :: proc(instance: Instance) {
 	CreateVulkanDeviceKHR = auto_cast out_function
 	GetInstanceProcAddr(instance, "xrGetVulkanGraphicsDevice2KHR", &out_function)
 	GetVulkanGraphicsDevice2KHR = auto_cast out_function
+	GetInstanceProcAddr(instance, "xrGetVulkanGraphicsRequirements2KHR", &out_function)
+	GetVulkanGraphicsRequirements2KHR = auto_cast out_function
 	GetInstanceProcAddr(instance, "xrConvertTimeToTimespecTimeKHR", &out_function)
 	ConvertTimeToTimespecTimeKHR = auto_cast out_function
 	GetInstanceProcAddr(instance, "xrConvertTimespecTimeToTimeKHR", &out_function)

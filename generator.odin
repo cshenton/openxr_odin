@@ -925,7 +925,15 @@ gen_instance_loader :: proc(builder: ^strings.Builder, doc: ^xml.Document) {
 	for id in commands_el.children {
 		child_el := doc.elements[id]
 		if child_el.ident != "command" {continue}
-		if len(child_el.children) == 0 {continue}
+		// Handle aliased commands special case. Just xrGetVulkanGraphicsRequirements2KHR as of writing
+		if el_has_attrib(child_el, "alias") {
+			full_name := el_get_attrib(child_el, "name")
+			name := strings.trim_prefix(full_name, "xr")
+			get_str := fmt.aprintf("\tGetInstanceProcAddr(instance, \"{}\", &out_function)\n", full_name)
+			strings.write_string(builder, get_str)
+			strings.write_string(builder, fmt.aprintf("\t{} = auto_cast out_function\n", name))
+			continue
+		}
 		proto_el := doc.elements[child_el.children[0]]
 		full_name := doc.elements[proto_el.children[1]].value
 		if is_base_proc(full_name) {continue}
