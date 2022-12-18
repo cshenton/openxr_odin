@@ -17,114 +17,12 @@ foreign openxr_loader {
 load_base_procs :: proc() {
 	out_function : ProcVoidFunction
 
-	GetInstanceProcAddr(nil, "xrAcquireSwapchainImage", &out_function)
-	AcquireSwapchainImage = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrApplyHapticFeedback", &out_function)
-	ApplyHapticFeedback = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrAttachSessionActionSets", &out_function)
-	AttachSessionActionSets = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrBeginFrame", &out_function)
-	BeginFrame = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrBeginSession", &out_function)
-	BeginSession = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrCreateAction", &out_function)
-	CreateAction = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrCreateActionSet", &out_function)
-	CreateActionSet = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrCreateActionSpace", &out_function)
-	CreateActionSpace = auto_cast out_function
 	GetInstanceProcAddr(nil, "xrCreateInstance", &out_function)
 	CreateInstance = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrCreateReferenceSpace", &out_function)
-	CreateReferenceSpace = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrCreateSession", &out_function)
-	CreateSession = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrCreateSwapchain", &out_function)
-	CreateSwapchain = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrDestroyAction", &out_function)
-	DestroyAction = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrDestroyActionSet", &out_function)
-	DestroyActionSet = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrDestroyInstance", &out_function)
-	DestroyInstance = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrDestroySession", &out_function)
-	DestroySession = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrDestroySpace", &out_function)
-	DestroySpace = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrDestroySwapchain", &out_function)
-	DestroySwapchain = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEndFrame", &out_function)
-	EndFrame = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEndSession", &out_function)
-	EndSession = auto_cast out_function
 	GetInstanceProcAddr(nil, "xrEnumerateApiLayerProperties", &out_function)
 	EnumerateApiLayerProperties = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEnumerateBoundSourcesForAction", &out_function)
-	EnumerateBoundSourcesForAction = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEnumerateEnvironmentBlendModes", &out_function)
-	EnumerateEnvironmentBlendModes = auto_cast out_function
 	GetInstanceProcAddr(nil, "xrEnumerateInstanceExtensionProperties", &out_function)
 	EnumerateInstanceExtensionProperties = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEnumerateReferenceSpaces", &out_function)
-	EnumerateReferenceSpaces = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEnumerateSwapchainFormats", &out_function)
-	EnumerateSwapchainFormats = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEnumerateSwapchainImages", &out_function)
-	EnumerateSwapchainImages = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEnumerateViewConfigurations", &out_function)
-	EnumerateViewConfigurations = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrEnumerateViewConfigurationViews", &out_function)
-	EnumerateViewConfigurationViews = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetActionStateBoolean", &out_function)
-	GetActionStateBoolean = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetActionStateFloat", &out_function)
-	GetActionStateFloat = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetActionStatePose", &out_function)
-	GetActionStatePose = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetActionStateVector2f", &out_function)
-	GetActionStateVector2f = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetCurrentInteractionProfile", &out_function)
-	GetCurrentInteractionProfile = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetInputSourceLocalizedName", &out_function)
-	GetInputSourceLocalizedName = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetInstanceProperties", &out_function)
-	GetInstanceProperties = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetReferenceSpaceBoundsRect", &out_function)
-	GetReferenceSpaceBoundsRect = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetSystem", &out_function)
-	GetSystem = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetSystemProperties", &out_function)
-	GetSystemProperties = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrGetViewConfigurationProperties", &out_function)
-	GetViewConfigurationProperties = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrLocateSpace", &out_function)
-	LocateSpace = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrLocateViews", &out_function)
-	LocateViews = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrPathToString", &out_function)
-	PathToString = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrPollEvent", &out_function)
-	PollEvent = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrReleaseSwapchainImage", &out_function)
-	ReleaseSwapchainImage = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrRequestExitSession", &out_function)
-	RequestExitSession = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrResultToString", &out_function)
-	ResultToString = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrStopHapticFeedback", &out_function)
-	StopHapticFeedback = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrStringToPath", &out_function)
-	StringToPath = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrStructureTypeToString", &out_function)
-	StructureTypeToString = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrSuggestInteractionProfileBindings", &out_function)
-	SuggestInteractionProfileBindings = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrSyncActions", &out_function)
-	SyncActions = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrWaitFrame", &out_function)
-	WaitFrame = auto_cast out_function
-	GetInstanceProcAddr(nil, "xrWaitSwapchainImage", &out_function)
-	WaitSwapchainImage = auto_cast out_function
 }
 
 
@@ -132,12 +30,6 @@ load_base_procs :: proc() {
 load_instance_procs :: proc(instance: Instance) {
         out_function : ProcVoidFunction
 
-	GetInstanceProcAddr(instance, "xrEnumerateApiLayerProperties", &out_function)
-	EnumerateApiLayerProperties = auto_cast out_function
-	GetInstanceProcAddr(instance, "xrEnumerateInstanceExtensionProperties", &out_function)
-	EnumerateInstanceExtensionProperties = auto_cast out_function
-	GetInstanceProcAddr(instance, "xrCreateInstance", &out_function)
-	CreateInstance = auto_cast out_function
 	GetInstanceProcAddr(instance, "xrDestroyInstance", &out_function)
 	DestroyInstance = auto_cast out_function
 	GetInstanceProcAddr(instance, "xrResultToString", &out_function)

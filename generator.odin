@@ -856,63 +856,7 @@ foreign openxr_loader {
 
 `
 
-BASE_PROCS := [?]string{
-	"xrAcquireSwapchainImage",
-	"xrApplyHapticFeedback",
-	"xrAttachSessionActionSets",
-	"xrBeginFrame",
-	"xrBeginSession",
-	"xrCreateAction",
-	"xrCreateActionSet",
-	"xrCreateActionSpace",
-	"xrCreateInstance",
-	"xrCreateReferenceSpace",
-	"xrCreateSession",
-	"xrCreateSwapchain",
-	"xrDestroyAction",
-	"xrDestroyActionSet",
-	"xrDestroyInstance",
-	"xrDestroySession",
-	"xrDestroySpace",
-	"xrDestroySwapchain",
-	"xrEndFrame",
-	"xrEndSession",
-	"xrEnumerateApiLayerProperties",
-	"xrEnumerateBoundSourcesForAction",
-	"xrEnumerateEnvironmentBlendModes",
-	"xrEnumerateInstanceExtensionProperties",
-	"xrEnumerateReferenceSpaces",
-	"xrEnumerateSwapchainFormats",
-	"xrEnumerateSwapchainImages",
-	"xrEnumerateViewConfigurations",
-	"xrEnumerateViewConfigurationViews",
-	"xrGetActionStateBoolean",
-	"xrGetActionStateFloat",
-	"xrGetActionStatePose",
-	"xrGetActionStateVector2f",
-	"xrGetCurrentInteractionProfile",
-	"xrGetInputSourceLocalizedName",
-	"xrGetInstanceProcAddr",
-	"xrGetInstanceProperties",
-	"xrGetReferenceSpaceBoundsRect",
-	"xrGetSystem",
-	"xrGetSystemProperties",
-	"xrGetViewConfigurationProperties",
-	"xrLocateSpace",
-	"xrLocateViews",
-	"xrPathToString",
-	"xrPollEvent",
-	"xrReleaseSwapchainImage",
-	"xrRequestExitSession",
-	"xrResultToString",
-	"xrStopHapticFeedback",
-	"xrStringToPath",
-	"xrStructureTypeToString",
-	"xrSuggestInteractionProfileBindings",
-	"xrSyncActions",
-	"xrWaitFrame",
-	"xrWaitSwapchainImage",
-}
+BASE_PROCS := [?]string{"xrCreateInstance", "xrEnumerateApiLayerProperties", "xrEnumerateInstanceExtensionProperties"}
 
 is_base_proc :: proc(name: string) -> bool {
 	for proc_name in BASE_PROCS {
@@ -975,6 +919,7 @@ gen_instance_loader :: proc(builder: ^strings.Builder, doc: ^xml.Document) {
 		if len(child_el.children) == 0 {continue}
 		proto_el := doc.elements[child_el.children[0]]
 		full_name := doc.elements[proto_el.children[1]].value
+		if is_base_proc(full_name) {continue}
 		if full_name == "xrGetInstanceProcAddr" {continue}
 		// fmt.println(child_el)
 		name := strings.trim_prefix(full_name, "xr")
