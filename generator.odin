@@ -82,6 +82,12 @@ ControllerModelKeyMSFT  :: distinct Atom
 AsyncRequestIdFB        :: distinct Atom
 RenderModelKeyFB        :: distinct Atom
 
+// Helper function for generating fixed buffer strings
+make_string :: proc(str: string, $n: int) -> [n]u8 {
+	result: [n]u8
+	copy(result[:], str)
+	return result
+}
 
 // Function pointer types
 ProcSetProcAddress :: #type proc "c" (p: rawptr, name: cstring)
