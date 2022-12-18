@@ -72,6 +72,20 @@ main :: proc() {
 }
 ```
 
+## Completeness
+
+These bindings are not complete. Specifically, I do not generate the following structs:
+
+- `XrGraphicsBindingOpenGLXlibKHR`
+- `XrGraphicsBindingOpenGLXcbKHR`
+- `XrGraphicsBindingOpenGLWaylandKHR`
+- `XrGraphicsBindingOpenGLESAndroidKHR`
+- `XrGraphicsBindingEGLMNDX`
+
+Because the odin `core` packages do not have the required types and I didn't want to be opinionated about these
+platforms. `D3D11`, `D3D12` and `Vulkan` graphics bindings structs are generated, so you can still target Linux,
+just not on OpenGL (and you'll need to BYO `libopenxr_loader.so.1`)
+
 ## Stability
 
 These bindings are not guaranteed correct nor stable. I have just gotten the generator working end to
