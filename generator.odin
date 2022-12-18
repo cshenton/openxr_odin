@@ -23,8 +23,8 @@ main :: proc() {
 
 	// Prepass extensions info
 	// TODO: Get Constants from extensions
-	// TODO: Prepass in enums, build dict of all extended enums to get full definitions
 	// TODO: Handle XrSwapchainUsageFlagBits special case (only vendor extended bitmask)
+	// TODO: Change flag bits generation to separate flag and flags (get flags from types)
 
 	// Get struct arrays
 	// TODO: Parse struct fields for arrayness and length
@@ -186,8 +186,19 @@ gen_extension_constant :: proc(builder: ^strings.Builder, doc: ^xml.Document, el
 	screaming_name := strings.to_screaming_snake_case(name)
 
 	strings.write_string(builder, fmt.aprintf("{} :: {}\n", name, number))
-	strings.write_string(builder, fmt.aprintf("{}_SPEC_VERSION :: {}\n", screaming_name, spec_version))
 	strings.write_string(builder, fmt.aprintf("{}_EXTENSION_NAME :: \"{}\"\n", screaming_name, full_name))
+	// strings.write_string(builder, fmt.aprintf("{}_SPEC_VERSION :: {}\n", screaming_name, spec_version))
+
+	for id in doc.elements[el.children[0]].children {
+		// We're looking for enums with a value field
+		child_el := doc.elements[id]
+		if child_el.ident != "enum" || !el_has_attrib(child_el, "value") {continue}
+		child_full_name := el_get_attrib(child_el, "name")
+		child_value := el_get_attrib(child_el, "value")
+		if strings.has_suffix(child_full_name, "_NAME") {continue}
+		child_name := strings.to_screaming_snake_case(strings.trim_prefix(child_full_name, "XR_"))
+		strings.write_string(builder, fmt.aprintf("{} :: {}\n", child_name, child_value))
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
