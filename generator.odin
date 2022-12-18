@@ -21,11 +21,6 @@ main :: proc() {
 		return
 	}
 
-	// Generate functions
-	// TODO: Generate dummy function pointer types
-	// TODO: Generate function signatures
-	// TODO: Generate CreateFooBar : ProcCreateFooBar members
-
 	// Write loader
 	// TODO: Link GetInstanceProcAddress
 	// TODO: Gather all instance, device functions and write procs to load in fn pointers
@@ -34,6 +29,7 @@ main :: proc() {
 	gen_enums_odin(doc)
 	gen_structs_odin(doc)
 	gen_procedures_odin(doc)
+	gen_loader_odin(doc)
 }
 
 el_get_attrib :: proc(el: xml.Element, key: string) -> string {
@@ -742,11 +738,12 @@ gen_procedure_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xm
 	proto_el := doc.elements[el.children[0]]
 	assert(proto_el.ident == "proto")
 	full_name := doc.elements[proto_el.children[1]].value
+	if full_name == "xrGetInstanceProcAddr" {return} 	// Skip this since we manually link it
 	full_return_type := doc.elements[proto_el.children[0]].value
 	name := strings.trim_prefix(full_name, "xr")
 	return_type := strings.trim_prefix(full_return_type, "Xr")
 
-	strings.write_string(builder, fmt.aprintf("Proc{} :: #type proc \"c\" (\n", name))
+	strings.write_string(builder, fmt.aprintf("Proc{} :: #type proc \"system\" (\n", name))
 	// The remaining children will be the function arguments
 	for id in el.children[1:] {
 		child_el := doc.elements[id]
@@ -758,11 +755,11 @@ gen_procedure_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xm
 }
 
 gen_procedure_arg :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
-	
+
 	type_str := doc.elements[el.children[0]].value
 	name_str := doc.elements[el.children[1]].value
-	
-	
+
+
 	// Apply alias and trim Xr prefix
 	if type_str in TYPE_ALIASES {
 		type_str = TYPE_ALIASES[type_str]
@@ -835,7 +832,155 @@ gen_procedure :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Ele
 	proto_el := doc.elements[el.children[0]]
 	assert(proto_el.ident == "proto")
 	full_name := doc.elements[proto_el.children[1]].value
+	if full_name == "xrGetInstanceProcAddr" {return} 	// Skip this since we manually link it
 	name := strings.trim_prefix(full_name, "xr")
 
 	strings.write_string(builder, fmt.aprintf("{}: Proc{}\n", name, name))
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                               LOADER.ODIN                                                               //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+LOADER_LINKS :: `
+// Link just the proc address loader
+foreign import openxr_loader "openxr_loader.lib"
+foreign openxr_loader {
+	@(link_name = "xrGetInstanceProcAddr")
+	GetInstanceProcAddr :: proc "system" (
+		instance: Instance,
+		name: cstring,
+		function: ^ProcVoidFunction,
+	) -> Result ---
+}
+
+`
+
+BASE_PROCS := [?]string{
+	"xrAcquireSwapchainImage",
+	"xrApplyHapticFeedback",
+	"xrAttachSessionActionSets",
+	"xrBeginFrame",
+	"xrBeginSession",
+	"xrCreateAction",
+	"xrCreateActionSet",
+	"xrCreateActionSpace",
+	"xrCreateInstance",
+	"xrCreateReferenceSpace",
+	"xrCreateSession",
+	"xrCreateSwapchain",
+	"xrDestroyAction",
+	"xrDestroyActionSet",
+	"xrDestroyInstance",
+	"xrDestroySession",
+	"xrDestroySpace",
+	"xrDestroySwapchain",
+	"xrEndFrame",
+	"xrEndSession",
+	"xrEnumerateApiLayerProperties",
+	"xrEnumerateBoundSourcesForAction",
+	"xrEnumerateEnvironmentBlendModes",
+	"xrEnumerateInstanceExtensionProperties",
+	"xrEnumerateReferenceSpaces",
+	"xrEnumerateSwapchainFormats",
+	"xrEnumerateSwapchainImages",
+	"xrEnumerateViewConfigurations",
+	"xrEnumerateViewConfigurationViews",
+	"xrGetActionStateBoolean",
+	"xrGetActionStateFloat",
+	"xrGetActionStatePose",
+	"xrGetActionStateVector2f",
+	"xrGetCurrentInteractionProfile",
+	"xrGetInputSourceLocalizedName",
+	"xrGetInstanceProcAddr",
+	"xrGetInstanceProperties",
+	"xrGetReferenceSpaceBoundsRect",
+	"xrGetSystem",
+	"xrGetSystemProperties",
+	"xrGetViewConfigurationProperties",
+	"xrLocateSpace",
+	"xrLocateViews",
+	"xrPathToString",
+	"xrPollEvent",
+	"xrReleaseSwapchainImage",
+	"xrRequestExitSession",
+	"xrResultToString",
+	"xrStopHapticFeedback",
+	"xrStringToPath",
+	"xrStructureTypeToString",
+	"xrSuggestInteractionProfileBindings",
+	"xrSyncActions",
+	"xrWaitFrame",
+	"xrWaitSwapchainImage",
+}
+
+is_base_proc :: proc(name: string) -> bool {
+	for proc_name in BASE_PROCS {
+		if name != proc_name {continue}
+		return true
+	}
+	return false
+}
+
+// Generates the full enums.odin file and writes it out
+gen_loader_odin :: proc(doc: ^xml.Document) {
+	builder := strings.builder_make()
+	strings.write_string(&builder, "package openxr\n\n")
+	strings.write_string(&builder, LOADER_LINKS)
+
+	gen_base_loader(&builder, doc)
+	gen_instance_loader(&builder, doc)
+
+	os.write_entire_file("openxr/loader.odin", builder.buf[:])
+}
+
+BASE_LOADER_START :: `
+// Loads all the base procedures which don't require an instance
+load_base_procs :: proc() {
+	out_function : ProcVoidFunction
+
+`
+
+gen_base_loader :: proc(builder: ^strings.Builder, doc: ^xml.Document) {
+	strings.write_string(builder, BASE_LOADER_START)
+
+	for full_name in BASE_PROCS {
+		if full_name == "xrGetInstanceProcAddr" {continue}
+		name := strings.trim_prefix(full_name, "xr")
+		strings.write_string(builder, fmt.aprintf("\tGetInstanceProcAddr(nil, \"{}\", &out_function)\n", full_name))
+		strings.write_string(builder, fmt.aprintf("\t{} = auto_cast out_function\n", name))
+	}
+
+	strings.write_string(builder, "}\n\n")
+}
+
+INSTANCE_LOADER_START :: `
+// Load all the instance procedures
+load_instance_procs :: proc(instance: Instance) {
+        out_function : ProcVoidFunction
+
+`
+
+gen_instance_loader :: proc(builder: ^strings.Builder, doc: ^xml.Document) {
+	strings.write_string(builder, INSTANCE_LOADER_START)
+	commands_el: xml.Element
+	for id in doc.elements[0].children {
+		if doc.elements[id].ident != "commands" {continue}
+		commands_el = doc.elements[id]
+	}
+
+	for id in commands_el.children {
+		child_el := doc.elements[id]
+		if child_el.ident != "command" {continue}
+		if len(child_el.children) == 0 {continue}
+		proto_el := doc.elements[child_el.children[0]]
+		full_name := doc.elements[proto_el.children[1]].value
+		if full_name == "xrGetInstanceProcAddr" {continue}
+		// fmt.println(child_el)
+		name := strings.trim_prefix(full_name, "xr")
+		strings.write_string(builder, fmt.aprintf("\tGetInstanceProcAddr(instance, \"{}\", &out_function)\n", full_name))
+		strings.write_string(builder, fmt.aprintf("\t{} = auto_cast out_function\n", name))
+	}
+
+	strings.write_string(builder, "}\n\n")
 }

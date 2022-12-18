@@ -18,157 +18,151 @@ when ODIN_OS == .Windows {
         LARGE_INTEGER :: distinct distinct c.longlong
 }
 
-ProcGetInstanceProcAddr :: #type proc "c" (
-	instance: Instance,
-	name: cstring,
-	function: ^ProcVoidFunction,
-) -> Result
-
-ProcEnumerateApiLayerProperties :: #type proc "c" (
+ProcEnumerateApiLayerProperties :: #type proc "system" (
 	propertyCapacityInput: u32,
 	propertyCountOutput: ^u32,
 	properties: ^ApiLayerProperties,
 ) -> Result
 
-ProcEnumerateInstanceExtensionProperties :: #type proc "c" (
+ProcEnumerateInstanceExtensionProperties :: #type proc "system" (
 	layerName: cstring,
 	propertyCapacityInput: u32,
 	propertyCountOutput: ^u32,
 	properties: ^ExtensionProperties,
 ) -> Result
 
-ProcCreateInstance :: #type proc "c" (
+ProcCreateInstance :: #type proc "system" (
 	createInfo: ^InstanceCreateInfo,
 	instance: ^Instance,
 ) -> Result
 
-ProcDestroyInstance :: #type proc "c" (
+ProcDestroyInstance :: #type proc "system" (
 	instance: Instance,
 ) -> Result
 
-ProcResultToString :: #type proc "c" (
+ProcResultToString :: #type proc "system" (
 	instance: Instance,
 	value: Result,
 	buffer: [^]u8,
 ) -> Result
 
-ProcStructureTypeToString :: #type proc "c" (
+ProcStructureTypeToString :: #type proc "system" (
 	instance: Instance,
 	value: StructureType,
 	buffer: [^]u8,
 ) -> Result
 
-ProcGetInstanceProperties :: #type proc "c" (
+ProcGetInstanceProperties :: #type proc "system" (
 	instance: Instance,
 	instanceProperties: ^InstanceProperties,
 ) -> Result
 
-ProcGetSystem :: #type proc "c" (
+ProcGetSystem :: #type proc "system" (
 	instance: Instance,
 	getInfo: ^SystemGetInfo,
 	systemId: ^SystemId,
 ) -> Result
 
-ProcGetSystemProperties :: #type proc "c" (
+ProcGetSystemProperties :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	properties: ^SystemProperties,
 ) -> Result
 
-ProcCreateSession :: #type proc "c" (
+ProcCreateSession :: #type proc "system" (
 	instance: Instance,
 	createInfo: ^SessionCreateInfo,
 	session: ^Session,
 ) -> Result
 
-ProcDestroySession :: #type proc "c" (
+ProcDestroySession :: #type proc "system" (
 	session: Session,
 ) -> Result
 
-ProcDestroySpace :: #type proc "c" (
+ProcDestroySpace :: #type proc "system" (
 	space: Space,
 ) -> Result
 
-ProcEnumerateSwapchainFormats :: #type proc "c" (
+ProcEnumerateSwapchainFormats :: #type proc "system" (
 	session: Session,
 	formatCapacityInput: u32,
 	formatCountOutput: ^u32,
 	formats: ^i64,
 ) -> Result
 
-ProcCreateSwapchain :: #type proc "c" (
+ProcCreateSwapchain :: #type proc "system" (
 	session: Session,
 	createInfo: ^SwapchainCreateInfo,
 	swapchain: ^Swapchain,
 ) -> Result
 
-ProcDestroySwapchain :: #type proc "c" (
+ProcDestroySwapchain :: #type proc "system" (
 	swapchain: Swapchain,
 ) -> Result
 
-ProcEnumerateSwapchainImages :: #type proc "c" (
+ProcEnumerateSwapchainImages :: #type proc "system" (
 	swapchain: Swapchain,
 	imageCapacityInput: u32,
 	imageCountOutput: ^u32,
 	images: ^SwapchainImageBaseHeader,
 ) -> Result
 
-ProcAcquireSwapchainImage :: #type proc "c" (
+ProcAcquireSwapchainImage :: #type proc "system" (
 	swapchain: Swapchain,
 	acquireInfo: ^SwapchainImageAcquireInfo,
 	index: ^u32,
 ) -> Result
 
-ProcWaitSwapchainImage :: #type proc "c" (
+ProcWaitSwapchainImage :: #type proc "system" (
 	swapchain: Swapchain,
 	waitInfo: ^SwapchainImageWaitInfo,
 ) -> Result
 
-ProcReleaseSwapchainImage :: #type proc "c" (
+ProcReleaseSwapchainImage :: #type proc "system" (
 	swapchain: Swapchain,
 	releaseInfo: ^SwapchainImageReleaseInfo,
 ) -> Result
 
-ProcBeginSession :: #type proc "c" (
+ProcBeginSession :: #type proc "system" (
 	session: Session,
 	beginInfo: ^SessionBeginInfo,
 ) -> Result
 
-ProcEndSession :: #type proc "c" (
+ProcEndSession :: #type proc "system" (
 	session: Session,
 ) -> Result
 
-ProcRequestExitSession :: #type proc "c" (
+ProcRequestExitSession :: #type proc "system" (
 	session: Session,
 ) -> Result
 
-ProcEnumerateReferenceSpaces :: #type proc "c" (
+ProcEnumerateReferenceSpaces :: #type proc "system" (
 	session: Session,
 	spaceCapacityInput: u32,
 	spaceCountOutput: ^u32,
 	spaces: ^ReferenceSpaceType,
 ) -> Result
 
-ProcCreateReferenceSpace :: #type proc "c" (
+ProcCreateReferenceSpace :: #type proc "system" (
 	session: Session,
 	createInfo: ^ReferenceSpaceCreateInfo,
 	space: ^Space,
 ) -> Result
 
-ProcCreateActionSpace :: #type proc "c" (
+ProcCreateActionSpace :: #type proc "system" (
 	session: Session,
 	createInfo: ^ActionSpaceCreateInfo,
 	space: ^Space,
 ) -> Result
 
-ProcLocateSpace :: #type proc "c" (
+ProcLocateSpace :: #type proc "system" (
 	space: Space,
 	baseSpace: Space,
 	time: Time,
 	location: ^SpaceLocation,
 ) -> Result
 
-ProcEnumerateViewConfigurations :: #type proc "c" (
+ProcEnumerateViewConfigurations :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	viewConfigurationTypeCapacityInput: u32,
@@ -176,7 +170,7 @@ ProcEnumerateViewConfigurations :: #type proc "c" (
 	viewConfigurationTypes: ^ViewConfigurationType,
 ) -> Result
 
-ProcEnumerateEnvironmentBlendModes :: #type proc "c" (
+ProcEnumerateEnvironmentBlendModes :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	viewConfigurationType: ViewConfigurationType,
@@ -185,14 +179,14 @@ ProcEnumerateEnvironmentBlendModes :: #type proc "c" (
 	environmentBlendModes: ^EnvironmentBlendMode,
 ) -> Result
 
-ProcGetViewConfigurationProperties :: #type proc "c" (
+ProcGetViewConfigurationProperties :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	viewConfigurationType: ViewConfigurationType,
 	configurationProperties: ^ViewConfigurationProperties,
 ) -> Result
 
-ProcEnumerateViewConfigurationViews :: #type proc "c" (
+ProcEnumerateViewConfigurationViews :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	viewConfigurationType: ViewConfigurationType,
@@ -201,12 +195,12 @@ ProcEnumerateViewConfigurationViews :: #type proc "c" (
 	views: ^ViewConfigurationView,
 ) -> Result
 
-ProcBeginFrame :: #type proc "c" (
+ProcBeginFrame :: #type proc "system" (
 	session: Session,
 	frameBeginInfo: ^FrameBeginInfo,
 ) -> Result
 
-ProcLocateViews :: #type proc "c" (
+ProcLocateViews :: #type proc "system" (
 	session: Session,
 	viewLocateInfo: ^ViewLocateInfo,
 	viewState: ^ViewState,
@@ -215,40 +209,40 @@ ProcLocateViews :: #type proc "c" (
 	views: ^View,
 ) -> Result
 
-ProcEndFrame :: #type proc "c" (
+ProcEndFrame :: #type proc "system" (
 	session: Session,
 	frameEndInfo: ^FrameEndInfo,
 ) -> Result
 
-ProcWaitFrame :: #type proc "c" (
+ProcWaitFrame :: #type proc "system" (
 	session: Session,
 	frameWaitInfo: ^FrameWaitInfo,
 	frameState: ^FrameState,
 ) -> Result
 
-ProcApplyHapticFeedback :: #type proc "c" (
+ProcApplyHapticFeedback :: #type proc "system" (
 	session: Session,
 	hapticActionInfo: ^HapticActionInfo,
 	hapticFeedback: ^HapticBaseHeader,
 ) -> Result
 
-ProcStopHapticFeedback :: #type proc "c" (
+ProcStopHapticFeedback :: #type proc "system" (
 	session: Session,
 	hapticActionInfo: ^HapticActionInfo,
 ) -> Result
 
-ProcPollEvent :: #type proc "c" (
+ProcPollEvent :: #type proc "system" (
 	instance: Instance,
 	eventData: ^EventDataBuffer,
 ) -> Result
 
-ProcStringToPath :: #type proc "c" (
+ProcStringToPath :: #type proc "system" (
 	instance: Instance,
 	pathString: cstring,
 	path: ^Path,
 ) -> Result
 
-ProcPathToString :: #type proc "c" (
+ProcPathToString :: #type proc "system" (
 	instance: Instance,
 	path: Path,
 	bufferCapacityInput: u32,
@@ -256,91 +250,91 @@ ProcPathToString :: #type proc "c" (
 	buffer: cstring,
 ) -> Result
 
-ProcGetReferenceSpaceBoundsRect :: #type proc "c" (
+ProcGetReferenceSpaceBoundsRect :: #type proc "system" (
 	session: Session,
 	referenceSpaceType: ReferenceSpaceType,
 	bounds: ^Extent2Df,
 ) -> Result
 
-ProcSetAndroidApplicationThreadKHR :: #type proc "c" (
+ProcSetAndroidApplicationThreadKHR :: #type proc "system" (
 	session: Session,
 	threadType: AndroidThreadTypeKHR,
 	threadId: u32,
 ) -> Result
 
-ProcCreateSwapchainAndroidSurfaceKHR :: #type proc "c" (
+ProcCreateSwapchainAndroidSurfaceKHR :: #type proc "system" (
 	session: Session,
 	info: ^SwapchainCreateInfo,
 	swapchain: ^Swapchain,
 	surface: ^jobject,
 ) -> Result
 
-ProcGetActionStateBoolean :: #type proc "c" (
+ProcGetActionStateBoolean :: #type proc "system" (
 	session: Session,
 	getInfo: ^ActionStateGetInfo,
 	state: ^ActionStateBoolean,
 ) -> Result
 
-ProcGetActionStateFloat :: #type proc "c" (
+ProcGetActionStateFloat :: #type proc "system" (
 	session: Session,
 	getInfo: ^ActionStateGetInfo,
 	state: ^ActionStateFloat,
 ) -> Result
 
-ProcGetActionStateVector2f :: #type proc "c" (
+ProcGetActionStateVector2f :: #type proc "system" (
 	session: Session,
 	getInfo: ^ActionStateGetInfo,
 	state: ^ActionStateVector2f,
 ) -> Result
 
-ProcGetActionStatePose :: #type proc "c" (
+ProcGetActionStatePose :: #type proc "system" (
 	session: Session,
 	getInfo: ^ActionStateGetInfo,
 	state: ^ActionStatePose,
 ) -> Result
 
-ProcCreateActionSet :: #type proc "c" (
+ProcCreateActionSet :: #type proc "system" (
 	instance: Instance,
 	createInfo: ^ActionSetCreateInfo,
 	actionSet: ^ActionSet,
 ) -> Result
 
-ProcDestroyActionSet :: #type proc "c" (
+ProcDestroyActionSet :: #type proc "system" (
 	actionSet: ActionSet,
 ) -> Result
 
-ProcCreateAction :: #type proc "c" (
+ProcCreateAction :: #type proc "system" (
 	actionSet: ActionSet,
 	createInfo: ^ActionCreateInfo,
 	action: ^Action,
 ) -> Result
 
-ProcDestroyAction :: #type proc "c" (
+ProcDestroyAction :: #type proc "system" (
 	action: Action,
 ) -> Result
 
-ProcSuggestInteractionProfileBindings :: #type proc "c" (
+ProcSuggestInteractionProfileBindings :: #type proc "system" (
 	instance: Instance,
 	suggestedBindings: ^InteractionProfileSuggestedBinding,
 ) -> Result
 
-ProcAttachSessionActionSets :: #type proc "c" (
+ProcAttachSessionActionSets :: #type proc "system" (
 	session: Session,
 	attachInfo: ^SessionActionSetsAttachInfo,
 ) -> Result
 
-ProcGetCurrentInteractionProfile :: #type proc "c" (
+ProcGetCurrentInteractionProfile :: #type proc "system" (
 	session: Session,
 	topLevelUserPath: Path,
 	interactionProfile: ^InteractionProfileState,
 ) -> Result
 
-ProcSyncActions :: #type proc "c" (
+ProcSyncActions :: #type proc "system" (
 	session: Session,
 	syncInfo: ^ActionsSyncInfo,
 ) -> Result
 
-ProcEnumerateBoundSourcesForAction :: #type proc "c" (
+ProcEnumerateBoundSourcesForAction :: #type proc "system" (
 	session: Session,
 	enumerateInfo: ^BoundSourcesForActionEnumerateInfo,
 	sourceCapacityInput: u32,
@@ -348,7 +342,7 @@ ProcEnumerateBoundSourcesForAction :: #type proc "c" (
 	sources: ^Path,
 ) -> Result
 
-ProcGetInputSourceLocalizedName :: #type proc "c" (
+ProcGetInputSourceLocalizedName :: #type proc "system" (
 	session: Session,
 	getInfo: ^InputSourceLocalizedNameGetInfo,
 	bufferCapacityInput: u32,
@@ -356,7 +350,7 @@ ProcGetInputSourceLocalizedName :: #type proc "c" (
 	buffer: cstring,
 ) -> Result
 
-ProcGetVulkanInstanceExtensionsKHR :: #type proc "c" (
+ProcGetVulkanInstanceExtensionsKHR :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	bufferCapacityInput: u32,
@@ -364,7 +358,7 @@ ProcGetVulkanInstanceExtensionsKHR :: #type proc "c" (
 	buffer: cstring,
 ) -> Result
 
-ProcGetVulkanDeviceExtensionsKHR :: #type proc "c" (
+ProcGetVulkanDeviceExtensionsKHR :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	bufferCapacityInput: u32,
@@ -372,50 +366,50 @@ ProcGetVulkanDeviceExtensionsKHR :: #type proc "c" (
 	buffer: cstring,
 ) -> Result
 
-ProcGetVulkanGraphicsDeviceKHR :: #type proc "c" (
+ProcGetVulkanGraphicsDeviceKHR :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	vkInstance: vk.Instance,
 	vkPhysicalDevice: ^vk.PhysicalDevice,
 ) -> Result
 
-ProcGetOpenGLGraphicsRequirementsKHR :: #type proc "c" (
+ProcGetOpenGLGraphicsRequirementsKHR :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	graphicsRequirements: ^GraphicsRequirementsOpenGLKHR,
 ) -> Result
 
-ProcGetOpenGLESGraphicsRequirementsKHR :: #type proc "c" (
+ProcGetOpenGLESGraphicsRequirementsKHR :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	graphicsRequirements: ^GraphicsRequirementsOpenGLESKHR,
 ) -> Result
 
-ProcGetVulkanGraphicsRequirementsKHR :: #type proc "c" (
+ProcGetVulkanGraphicsRequirementsKHR :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	graphicsRequirements: ^GraphicsRequirementsVulkanKHR,
 ) -> Result
 
-ProcGetD3D11GraphicsRequirementsKHR :: #type proc "c" (
+ProcGetD3D11GraphicsRequirementsKHR :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	graphicsRequirements: ^GraphicsRequirementsD3D11KHR,
 ) -> Result
 
-ProcGetD3D12GraphicsRequirementsKHR :: #type proc "c" (
+ProcGetD3D12GraphicsRequirementsKHR :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	graphicsRequirements: ^GraphicsRequirementsD3D12KHR,
 ) -> Result
 
-ProcPerfSettingsSetPerformanceLevelEXT :: #type proc "c" (
+ProcPerfSettingsSetPerformanceLevelEXT :: #type proc "system" (
 	session: Session,
 	domain: PerfSettingsDomainEXT,
 	level: PerfSettingsLevelEXT,
 ) -> Result
 
-ProcThermalGetTemperatureTrendEXT :: #type proc "c" (
+ProcThermalGetTemperatureTrendEXT :: #type proc "system" (
 	session: Session,
 	domain: PerfSettingsDomainEXT,
 	notificationLevel: ^PerfSettingsNotificationLevelEXT,
@@ -423,87 +417,87 @@ ProcThermalGetTemperatureTrendEXT :: #type proc "c" (
 	tempSlope: ^f32,
 ) -> Result
 
-ProcSetDebugUtilsObjectNameEXT :: #type proc "c" (
+ProcSetDebugUtilsObjectNameEXT :: #type proc "system" (
 	instance: Instance,
 	nameInfo: ^DebugUtilsObjectNameInfoEXT,
 ) -> Result
 
-ProcCreateDebugUtilsMessengerEXT :: #type proc "c" (
+ProcCreateDebugUtilsMessengerEXT :: #type proc "system" (
 	instance: Instance,
 	createInfo: ^DebugUtilsMessengerCreateInfoEXT,
 	messenger: ^DebugUtilsMessengerEXT,
 ) -> Result
 
-ProcDestroyDebugUtilsMessengerEXT :: #type proc "c" (
+ProcDestroyDebugUtilsMessengerEXT :: #type proc "system" (
 	messenger: DebugUtilsMessengerEXT,
 ) -> Result
 
-ProcSubmitDebugUtilsMessageEXT :: #type proc "c" (
+ProcSubmitDebugUtilsMessageEXT :: #type proc "system" (
 	instance: Instance,
 	messageSeverity: DebugUtilsMessageSeverityFlagsEXT,
 	messageTypes: DebugUtilsMessageTypeFlagsEXT,
 	callbackData: ^DebugUtilsMessengerCallbackDataEXT,
 ) -> Result
 
-ProcSessionBeginDebugUtilsLabelRegionEXT :: #type proc "c" (
+ProcSessionBeginDebugUtilsLabelRegionEXT :: #type proc "system" (
 	session: Session,
 	labelInfo: ^DebugUtilsLabelEXT,
 ) -> Result
 
-ProcSessionEndDebugUtilsLabelRegionEXT :: #type proc "c" (
+ProcSessionEndDebugUtilsLabelRegionEXT :: #type proc "system" (
 	session: Session,
 ) -> Result
 
-ProcSessionInsertDebugUtilsLabelEXT :: #type proc "c" (
+ProcSessionInsertDebugUtilsLabelEXT :: #type proc "system" (
 	session: Session,
 	labelInfo: ^DebugUtilsLabelEXT,
 ) -> Result
 
-ProcConvertTimeToWin32PerformanceCounterKHR :: #type proc "c" (
+ProcConvertTimeToWin32PerformanceCounterKHR :: #type proc "system" (
 	instance: Instance,
 	time: Time,
 	performanceCounter: ^LARGE_INTEGER,
 ) -> Result
 
-ProcConvertWin32PerformanceCounterToTimeKHR :: #type proc "c" (
+ProcConvertWin32PerformanceCounterToTimeKHR :: #type proc "system" (
 	instance: Instance,
 	performanceCounter: ^LARGE_INTEGER,
 	time: ^Time,
 ) -> Result
 
-ProcCreateVulkanInstanceKHR :: #type proc "c" (
+ProcCreateVulkanInstanceKHR :: #type proc "system" (
 	instance: Instance,
 	createInfo: ^VulkanInstanceCreateInfoKHR,
 	vulkanInstance: ^vk.Instance,
 	vulkanResult: ^vk.Result,
 ) -> Result
 
-ProcCreateVulkanDeviceKHR :: #type proc "c" (
+ProcCreateVulkanDeviceKHR :: #type proc "system" (
 	instance: Instance,
 	createInfo: ^VulkanDeviceCreateInfoKHR,
 	vulkanDevice: ^vk.Device,
 	vulkanResult: ^vk.Result,
 ) -> Result
 
-ProcGetVulkanGraphicsDevice2KHR :: #type proc "c" (
+ProcGetVulkanGraphicsDevice2KHR :: #type proc "system" (
 	instance: Instance,
 	getInfo: ^VulkanGraphicsDeviceGetInfoKHR,
 	vulkanPhysicalDevice: ^vk.PhysicalDevice,
 ) -> Result
 
-ProcConvertTimeToTimespecTimeKHR :: #type proc "c" (
+ProcConvertTimeToTimespecTimeKHR :: #type proc "system" (
 	instance: Instance,
 	time: Time,
 	timespecTime: ^timespec,
 ) -> Result
 
-ProcConvertTimespecTimeToTimeKHR :: #type proc "c" (
+ProcConvertTimespecTimeToTimeKHR :: #type proc "system" (
 	instance: Instance,
 	timespecTime: ^timespec,
 	time: ^Time,
 ) -> Result
 
-ProcGetVisibilityMaskKHR :: #type proc "c" (
+ProcGetVisibilityMaskKHR :: #type proc "system" (
 	session: Session,
 	viewConfigurationType: ViewConfigurationType,
 	viewIndex: u32,
@@ -511,51 +505,51 @@ ProcGetVisibilityMaskKHR :: #type proc "c" (
 	visibilityMask: ^VisibilityMaskKHR,
 ) -> Result
 
-ProcCreateSpatialAnchorMSFT :: #type proc "c" (
+ProcCreateSpatialAnchorMSFT :: #type proc "system" (
 	session: Session,
 	createInfo: ^SpatialAnchorCreateInfoMSFT,
 	anchor: ^SpatialAnchorMSFT,
 ) -> Result
 
-ProcCreateSpatialAnchorSpaceMSFT :: #type proc "c" (
+ProcCreateSpatialAnchorSpaceMSFT :: #type proc "system" (
 	session: Session,
 	createInfo: ^SpatialAnchorSpaceCreateInfoMSFT,
 	space: ^Space,
 ) -> Result
 
-ProcDestroySpatialAnchorMSFT :: #type proc "c" (
+ProcDestroySpatialAnchorMSFT :: #type proc "system" (
 	anchor: SpatialAnchorMSFT,
 ) -> Result
 
-ProcSetInputDeviceActiveEXT :: #type proc "c" (
+ProcSetInputDeviceActiveEXT :: #type proc "system" (
 	session: Session,
 	interactionProfile: Path,
 	topLevelPath: Path,
 	isActive: b32,
 ) -> Result
 
-ProcSetInputDeviceStateBoolEXT :: #type proc "c" (
+ProcSetInputDeviceStateBoolEXT :: #type proc "system" (
 	session: Session,
 	topLevelPath: Path,
 	inputSourcePath: Path,
 	state: b32,
 ) -> Result
 
-ProcSetInputDeviceStateFloatEXT :: #type proc "c" (
+ProcSetInputDeviceStateFloatEXT :: #type proc "system" (
 	session: Session,
 	topLevelPath: Path,
 	inputSourcePath: Path,
 	state: f32,
 ) -> Result
 
-ProcSetInputDeviceStateVector2fEXT :: #type proc "c" (
+ProcSetInputDeviceStateVector2fEXT :: #type proc "system" (
 	session: Session,
 	topLevelPath: Path,
 	inputSourcePath: Path,
 	state: Vector2f,
 ) -> Result
 
-ProcSetInputDeviceLocationEXT :: #type proc "c" (
+ProcSetInputDeviceLocationEXT :: #type proc "system" (
 	session: Session,
 	topLevelPath: Path,
 	inputSourcePath: Path,
@@ -563,67 +557,67 @@ ProcSetInputDeviceLocationEXT :: #type proc "c" (
 	pose: Posef,
 ) -> Result
 
-ProcInitializeLoaderKHR :: #type proc "c" (
+ProcInitializeLoaderKHR :: #type proc "system" (
 	loaderInitInfo: ^LoaderInitInfoBaseHeaderKHR,
 ) -> Result
 
-ProcCreateSpatialGraphNodeSpaceMSFT :: #type proc "c" (
+ProcCreateSpatialGraphNodeSpaceMSFT :: #type proc "system" (
 	session: Session,
 	createInfo: ^SpatialGraphNodeSpaceCreateInfoMSFT,
 	space: ^Space,
 ) -> Result
 
-ProcTryCreateSpatialGraphStaticNodeBindingMSFT :: #type proc "c" (
+ProcTryCreateSpatialGraphStaticNodeBindingMSFT :: #type proc "system" (
 	session: Session,
 	createInfo: ^SpatialGraphStaticNodeBindingCreateInfoMSFT,
 	nodeBinding: ^SpatialGraphNodeBindingMSFT,
 ) -> Result
 
-ProcDestroySpatialGraphNodeBindingMSFT :: #type proc "c" (
+ProcDestroySpatialGraphNodeBindingMSFT :: #type proc "system" (
 	nodeBinding: SpatialGraphNodeBindingMSFT,
 ) -> Result
 
-ProcGetSpatialGraphNodeBindingPropertiesMSFT :: #type proc "c" (
+ProcGetSpatialGraphNodeBindingPropertiesMSFT :: #type proc "system" (
 	nodeBinding: SpatialGraphNodeBindingMSFT,
 	getInfo: ^SpatialGraphNodeBindingPropertiesGetInfoMSFT,
 	properties: ^SpatialGraphNodeBindingPropertiesMSFT,
 ) -> Result
 
-ProcCreateHandTrackerEXT :: #type proc "c" (
+ProcCreateHandTrackerEXT :: #type proc "system" (
 	session: Session,
 	createInfo: ^HandTrackerCreateInfoEXT,
 	handTracker: ^HandTrackerEXT,
 ) -> Result
 
-ProcDestroyHandTrackerEXT :: #type proc "c" (
+ProcDestroyHandTrackerEXT :: #type proc "system" (
 	handTracker: HandTrackerEXT,
 ) -> Result
 
-ProcLocateHandJointsEXT :: #type proc "c" (
+ProcLocateHandJointsEXT :: #type proc "system" (
 	handTracker: HandTrackerEXT,
 	locateInfo: ^HandJointsLocateInfoEXT,
 	locations: ^HandJointLocationsEXT,
 ) -> Result
 
-ProcCreateHandMeshSpaceMSFT :: #type proc "c" (
+ProcCreateHandMeshSpaceMSFT :: #type proc "system" (
 	handTracker: HandTrackerEXT,
 	createInfo: ^HandMeshSpaceCreateInfoMSFT,
 	space: ^Space,
 ) -> Result
 
-ProcUpdateHandMeshMSFT :: #type proc "c" (
+ProcUpdateHandMeshMSFT :: #type proc "system" (
 	handTracker: HandTrackerEXT,
 	updateInfo: ^HandMeshUpdateInfoMSFT,
 	handMesh: ^HandMeshMSFT,
 ) -> Result
 
-ProcGetControllerModelKeyMSFT :: #type proc "c" (
+ProcGetControllerModelKeyMSFT :: #type proc "system" (
 	session: Session,
 	topLevelUserPath: Path,
 	controllerModelKeyState: ^ControllerModelKeyStateMSFT,
 ) -> Result
 
-ProcLoadControllerModelMSFT :: #type proc "c" (
+ProcLoadControllerModelMSFT :: #type proc "system" (
 	session: Session,
 	modelKey: ControllerModelKeyMSFT,
 	bufferCapacityInput: u32,
@@ -631,19 +625,19 @@ ProcLoadControllerModelMSFT :: #type proc "c" (
 	buffer: ^u8,
 ) -> Result
 
-ProcGetControllerModelPropertiesMSFT :: #type proc "c" (
+ProcGetControllerModelPropertiesMSFT :: #type proc "system" (
 	session: Session,
 	modelKey: ControllerModelKeyMSFT,
 	properties: ^ControllerModelPropertiesMSFT,
 ) -> Result
 
-ProcGetControllerModelStateMSFT :: #type proc "c" (
+ProcGetControllerModelStateMSFT :: #type proc "system" (
 	session: Session,
 	modelKey: ControllerModelKeyMSFT,
 	state: ^ControllerModelStateMSFT,
 ) -> Result
 
-ProcEnumerateSceneComputeFeaturesMSFT :: #type proc "c" (
+ProcEnumerateSceneComputeFeaturesMSFT :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	featureCapacityInput: u32,
@@ -651,60 +645,60 @@ ProcEnumerateSceneComputeFeaturesMSFT :: #type proc "c" (
 	features: ^SceneComputeFeatureMSFT,
 ) -> Result
 
-ProcCreateSceneObserverMSFT :: #type proc "c" (
+ProcCreateSceneObserverMSFT :: #type proc "system" (
 	session: Session,
 	createInfo: ^SceneObserverCreateInfoMSFT,
 	sceneObserver: ^SceneObserverMSFT,
 ) -> Result
 
-ProcDestroySceneObserverMSFT :: #type proc "c" (
+ProcDestroySceneObserverMSFT :: #type proc "system" (
 	sceneObserver: SceneObserverMSFT,
 ) -> Result
 
-ProcCreateSceneMSFT :: #type proc "c" (
+ProcCreateSceneMSFT :: #type proc "system" (
 	sceneObserver: SceneObserverMSFT,
 	createInfo: ^SceneCreateInfoMSFT,
 	scene: ^SceneMSFT,
 ) -> Result
 
-ProcDestroySceneMSFT :: #type proc "c" (
+ProcDestroySceneMSFT :: #type proc "system" (
 	scene: SceneMSFT,
 ) -> Result
 
-ProcComputeNewSceneMSFT :: #type proc "c" (
+ProcComputeNewSceneMSFT :: #type proc "system" (
 	sceneObserver: SceneObserverMSFT,
 	computeInfo: ^NewSceneComputeInfoMSFT,
 ) -> Result
 
-ProcGetSceneComputeStateMSFT :: #type proc "c" (
+ProcGetSceneComputeStateMSFT :: #type proc "system" (
 	sceneObserver: SceneObserverMSFT,
 	state: ^SceneComputeStateMSFT,
 ) -> Result
 
-ProcGetSceneComponentsMSFT :: #type proc "c" (
+ProcGetSceneComponentsMSFT :: #type proc "system" (
 	scene: SceneMSFT,
 	getInfo: ^SceneComponentsGetInfoMSFT,
 	components: ^SceneComponentsMSFT,
 ) -> Result
 
-ProcLocateSceneComponentsMSFT :: #type proc "c" (
+ProcLocateSceneComponentsMSFT :: #type proc "system" (
 	scene: SceneMSFT,
 	locateInfo: ^SceneComponentsLocateInfoMSFT,
 	locations: ^SceneComponentLocationsMSFT,
 ) -> Result
 
-ProcGetSceneMeshBuffersMSFT :: #type proc "c" (
+ProcGetSceneMeshBuffersMSFT :: #type proc "system" (
 	scene: SceneMSFT,
 	getInfo: ^SceneMeshBuffersGetInfoMSFT,
 	buffers: ^SceneMeshBuffersMSFT,
 ) -> Result
 
-ProcDeserializeSceneMSFT :: #type proc "c" (
+ProcDeserializeSceneMSFT :: #type proc "system" (
 	sceneObserver: SceneObserverMSFT,
 	deserializeInfo: ^SceneDeserializeInfoMSFT,
 ) -> Result
 
-ProcGetSerializedSceneFragmentDataMSFT :: #type proc "c" (
+ProcGetSerializedSceneFragmentDataMSFT :: #type proc "system" (
 	scene: SceneMSFT,
 	getInfo: ^SerializedSceneFragmentDataGetInfoMSFT,
 	countInput: u32,
@@ -712,109 +706,109 @@ ProcGetSerializedSceneFragmentDataMSFT :: #type proc "c" (
 	buffer: ^u8,
 ) -> Result
 
-ProcEnumerateDisplayRefreshRatesFB :: #type proc "c" (
+ProcEnumerateDisplayRefreshRatesFB :: #type proc "system" (
 	session: Session,
 	displayRefreshRateCapacityInput: u32,
 	displayRefreshRateCountOutput: ^u32,
 	displayRefreshRates: ^f32,
 ) -> Result
 
-ProcGetDisplayRefreshRateFB :: #type proc "c" (
+ProcGetDisplayRefreshRateFB :: #type proc "system" (
 	session: Session,
 	displayRefreshRate: ^f32,
 ) -> Result
 
-ProcRequestDisplayRefreshRateFB :: #type proc "c" (
+ProcRequestDisplayRefreshRateFB :: #type proc "system" (
 	session: Session,
 	displayRefreshRate: f32,
 ) -> Result
 
-ProcCreateSpatialAnchorFromPerceptionAnchorMSFT :: #type proc "c" (
+ProcCreateSpatialAnchorFromPerceptionAnchorMSFT :: #type proc "system" (
 	session: Session,
 	perceptionAnchor: ^IUnknown,
 	anchor: ^SpatialAnchorMSFT,
 ) -> Result
 
-ProcTryGetPerceptionAnchorFromSpatialAnchorMSFT :: #type proc "c" (
+ProcTryGetPerceptionAnchorFromSpatialAnchorMSFT :: #type proc "system" (
 	session: Session,
 	anchor: SpatialAnchorMSFT,
 	perceptionAnchor: ^^IUnknown,
 ) -> Result
 
-ProcUpdateSwapchainFB :: #type proc "c" (
+ProcUpdateSwapchainFB :: #type proc "system" (
 	swapchain: Swapchain,
 	state: ^SwapchainStateBaseHeaderFB,
 ) -> Result
 
-ProcGetSwapchainStateFB :: #type proc "c" (
+ProcGetSwapchainStateFB :: #type proc "system" (
 	swapchain: Swapchain,
 	state: ^SwapchainStateBaseHeaderFB,
 ) -> Result
 
-ProcEnumerateColorSpacesFB :: #type proc "c" (
+ProcEnumerateColorSpacesFB :: #type proc "system" (
 	session: Session,
 	colorSpaceCapacityInput: u32,
 	colorSpaceCountOutput: ^u32,
 	colorSpaces: ^ColorSpaceFB,
 ) -> Result
 
-ProcSetColorSpaceFB :: #type proc "c" (
+ProcSetColorSpaceFB :: #type proc "system" (
 	session: Session,
 	colorspace: ColorSpaceFB,
 ) -> Result
 
-ProcCreateFoveationProfileFB :: #type proc "c" (
+ProcCreateFoveationProfileFB :: #type proc "system" (
 	session: Session,
 	createInfo: ^FoveationProfileCreateInfoFB,
 	profile: ^FoveationProfileFB,
 ) -> Result
 
-ProcDestroyFoveationProfileFB :: #type proc "c" (
+ProcDestroyFoveationProfileFB :: #type proc "system" (
 	profile: FoveationProfileFB,
 ) -> Result
 
-ProcGetHandMeshFB :: #type proc "c" (
+ProcGetHandMeshFB :: #type proc "system" (
 	handTracker: HandTrackerEXT,
 	mesh: ^HandTrackingMeshFB,
 ) -> Result
 
-ProcEnumerateRenderModelPathsFB :: #type proc "c" (
+ProcEnumerateRenderModelPathsFB :: #type proc "system" (
 	session: Session,
 	pathCapacityInput: u32,
 	pathCountOutput: ^u32,
 	paths: ^RenderModelPathInfoFB,
 ) -> Result
 
-ProcGetRenderModelPropertiesFB :: #type proc "c" (
+ProcGetRenderModelPropertiesFB :: #type proc "system" (
 	session: Session,
 	path: Path,
 	properties: ^RenderModelPropertiesFB,
 ) -> Result
 
-ProcLoadRenderModelFB :: #type proc "c" (
+ProcLoadRenderModelFB :: #type proc "system" (
 	session: Session,
 	info: ^RenderModelLoadInfoFB,
 	buffer: ^RenderModelBufferFB,
 ) -> Result
 
-ProcQuerySystemTrackedKeyboardFB :: #type proc "c" (
+ProcQuerySystemTrackedKeyboardFB :: #type proc "system" (
 	session: Session,
 	queryInfo: ^KeyboardTrackingQueryFB,
 	keyboard: ^KeyboardTrackingDescriptionFB,
 ) -> Result
 
-ProcCreateKeyboardSpaceFB :: #type proc "c" (
+ProcCreateKeyboardSpaceFB :: #type proc "system" (
 	session: Session,
 	createInfo: ^KeyboardSpaceCreateInfoFB,
 	keyboardSpace: ^Space,
 ) -> Result
 
-ProcSetEnvironmentDepthEstimationVARJO :: #type proc "c" (
+ProcSetEnvironmentDepthEstimationVARJO :: #type proc "system" (
 	session: Session,
 	enabled: b32,
 ) -> Result
 
-ProcEnumerateReprojectionModesMSFT :: #type proc "c" (
+ProcEnumerateReprojectionModesMSFT :: #type proc "system" (
 	instance: Instance,
 	systemId: SystemId,
 	viewConfigurationType: ViewConfigurationType,
@@ -823,344 +817,343 @@ ProcEnumerateReprojectionModesMSFT :: #type proc "c" (
 	modes: ^ReprojectionModeMSFT,
 ) -> Result
 
-ProcGetAudioOutputDeviceGuidOculus :: #type proc "c" (
+ProcGetAudioOutputDeviceGuidOculus :: #type proc "system" (
 	instance: Instance,
 	buffer: [^]wchar_t,
 ) -> Result
 
-ProcGetAudioInputDeviceGuidOculus :: #type proc "c" (
+ProcGetAudioInputDeviceGuidOculus :: #type proc "system" (
 	instance: Instance,
 	buffer: [^]wchar_t,
 ) -> Result
 
-ProcCreateSpatialAnchorFB :: #type proc "c" (
+ProcCreateSpatialAnchorFB :: #type proc "system" (
 	session: Session,
 	info: ^SpatialAnchorCreateInfoFB,
 	requestId: ^AsyncRequestIdFB,
 ) -> Result
 
-ProcGetSpaceUuidFB :: #type proc "c" (
+ProcGetSpaceUuidFB :: #type proc "system" (
 	space: Space,
 	uuid: ^UuidEXT,
 ) -> Result
 
-ProcEnumerateSpaceSupportedComponentsFB :: #type proc "c" (
+ProcEnumerateSpaceSupportedComponentsFB :: #type proc "system" (
 	space: Space,
 	componentTypeCapacityInput: u32,
 	componentTypeCountOutput: ^u32,
 	componentTypes: ^SpaceComponentTypeFB,
 ) -> Result
 
-ProcSetSpaceComponentStatusFB :: #type proc "c" (
+ProcSetSpaceComponentStatusFB :: #type proc "system" (
 	space: Space,
 	info: ^SpaceComponentStatusSetInfoFB,
 	requestId: ^AsyncRequestIdFB,
 ) -> Result
 
-ProcGetSpaceComponentStatusFB :: #type proc "c" (
+ProcGetSpaceComponentStatusFB :: #type proc "system" (
 	space: Space,
 	componentType: SpaceComponentTypeFB,
 	status: ^SpaceComponentStatusFB,
 ) -> Result
 
-ProcCreateTriangleMeshFB :: #type proc "c" (
+ProcCreateTriangleMeshFB :: #type proc "system" (
 	session: Session,
 	createInfo: ^TriangleMeshCreateInfoFB,
 	outTriangleMesh: ^TriangleMeshFB,
 ) -> Result
 
-ProcDestroyTriangleMeshFB :: #type proc "c" (
+ProcDestroyTriangleMeshFB :: #type proc "system" (
 	mesh: TriangleMeshFB,
 ) -> Result
 
-ProcTriangleMeshGetVertexBufferFB :: #type proc "c" (
+ProcTriangleMeshGetVertexBufferFB :: #type proc "system" (
 	mesh: TriangleMeshFB,
 	outVertexBuffer: ^^Vector3f,
 ) -> Result
 
-ProcTriangleMeshGetIndexBufferFB :: #type proc "c" (
+ProcTriangleMeshGetIndexBufferFB :: #type proc "system" (
 	mesh: TriangleMeshFB,
 	outIndexBuffer: ^^u32,
 ) -> Result
 
-ProcTriangleMeshBeginUpdateFB :: #type proc "c" (
+ProcTriangleMeshBeginUpdateFB :: #type proc "system" (
 	mesh: TriangleMeshFB,
 ) -> Result
 
-ProcTriangleMeshEndUpdateFB :: #type proc "c" (
+ProcTriangleMeshEndUpdateFB :: #type proc "system" (
 	mesh: TriangleMeshFB,
 	vertexCount: u32,
 	triangleCount: u32,
 ) -> Result
 
-ProcTriangleMeshBeginVertexBufferUpdateFB :: #type proc "c" (
+ProcTriangleMeshBeginVertexBufferUpdateFB :: #type proc "system" (
 	mesh: TriangleMeshFB,
 	outVertexCount: ^u32,
 ) -> Result
 
-ProcTriangleMeshEndVertexBufferUpdateFB :: #type proc "c" (
+ProcTriangleMeshEndVertexBufferUpdateFB :: #type proc "system" (
 	mesh: TriangleMeshFB,
 ) -> Result
 
-ProcCreatePassthroughFB :: #type proc "c" (
+ProcCreatePassthroughFB :: #type proc "system" (
 	session: Session,
 	createInfo: ^PassthroughCreateInfoFB,
 	outPassthrough: ^PassthroughFB,
 ) -> Result
 
-ProcDestroyPassthroughFB :: #type proc "c" (
+ProcDestroyPassthroughFB :: #type proc "system" (
 	passthrough: PassthroughFB,
 ) -> Result
 
-ProcPassthroughStartFB :: #type proc "c" (
+ProcPassthroughStartFB :: #type proc "system" (
 	passthrough: PassthroughFB,
 ) -> Result
 
-ProcPassthroughPauseFB :: #type proc "c" (
+ProcPassthroughPauseFB :: #type proc "system" (
 	passthrough: PassthroughFB,
 ) -> Result
 
-ProcCreatePassthroughLayerFB :: #type proc "c" (
+ProcCreatePassthroughLayerFB :: #type proc "system" (
 	session: Session,
 	createInfo: ^PassthroughLayerCreateInfoFB,
 	outLayer: ^PassthroughLayerFB,
 ) -> Result
 
-ProcDestroyPassthroughLayerFB :: #type proc "c" (
+ProcDestroyPassthroughLayerFB :: #type proc "system" (
 	layer: PassthroughLayerFB,
 ) -> Result
 
-ProcPassthroughLayerPauseFB :: #type proc "c" (
+ProcPassthroughLayerPauseFB :: #type proc "system" (
 	layer: PassthroughLayerFB,
 ) -> Result
 
-ProcPassthroughLayerResumeFB :: #type proc "c" (
+ProcPassthroughLayerResumeFB :: #type proc "system" (
 	layer: PassthroughLayerFB,
 ) -> Result
 
-ProcPassthroughLayerSetStyleFB :: #type proc "c" (
+ProcPassthroughLayerSetStyleFB :: #type proc "system" (
 	layer: PassthroughLayerFB,
 	style: ^PassthroughStyleFB,
 ) -> Result
 
-ProcCreateGeometryInstanceFB :: #type proc "c" (
+ProcCreateGeometryInstanceFB :: #type proc "system" (
 	session: Session,
 	createInfo: ^GeometryInstanceCreateInfoFB,
 	outGeometryInstance: ^GeometryInstanceFB,
 ) -> Result
 
-ProcDestroyGeometryInstanceFB :: #type proc "c" (
+ProcDestroyGeometryInstanceFB :: #type proc "system" (
 	instance: GeometryInstanceFB,
 ) -> Result
 
-ProcGeometryInstanceSetTransformFB :: #type proc "c" (
+ProcGeometryInstanceSetTransformFB :: #type proc "system" (
 	instance: GeometryInstanceFB,
 	transformation: ^GeometryInstanceTransformFB,
 ) -> Result
 
-ProcQuerySpacesFB :: #type proc "c" (
+ProcQuerySpacesFB :: #type proc "system" (
 	session: Session,
 	info: ^SpaceQueryInfoBaseHeaderFB,
 	requestId: ^AsyncRequestIdFB,
 ) -> Result
 
-ProcRetrieveSpaceQueryResultsFB :: #type proc "c" (
+ProcRetrieveSpaceQueryResultsFB :: #type proc "system" (
 	session: Session,
 	requestId: AsyncRequestIdFB,
 	results: ^SpaceQueryResultsFB,
 ) -> Result
 
-ProcSaveSpaceFB :: #type proc "c" (
+ProcSaveSpaceFB :: #type proc "system" (
 	session: Session,
 	info: ^SpaceSaveInfoFB,
 	requestId: ^AsyncRequestIdFB,
 ) -> Result
 
-ProcEraseSpaceFB :: #type proc "c" (
+ProcEraseSpaceFB :: #type proc "system" (
 	session: Session,
 	info: ^SpaceEraseInfoFB,
 	requestId: ^AsyncRequestIdFB,
 ) -> Result
 
-ProcGetSpaceContainerFB :: #type proc "c" (
+ProcGetSpaceContainerFB :: #type proc "system" (
 	session: Session,
 	space: Space,
 	spaceContainerOutput: ^SpaceContainerFB,
 ) -> Result
 
-ProcGetSpaceBoundingBox2DFB :: #type proc "c" (
+ProcGetSpaceBoundingBox2DFB :: #type proc "system" (
 	session: Session,
 	space: Space,
 	boundingBox2DOutput: ^Rect2Df,
 ) -> Result
 
-ProcGetSpaceBoundingBox3DFB :: #type proc "c" (
+ProcGetSpaceBoundingBox3DFB :: #type proc "system" (
 	session: Session,
 	space: Space,
 	boundingBox3DOutput: ^Rect3DfFB,
 ) -> Result
 
-ProcGetSpaceSemanticLabelsFB :: #type proc "c" (
+ProcGetSpaceSemanticLabelsFB :: #type proc "system" (
 	session: Session,
 	space: Space,
 	semanticLabelsOutput: ^SemanticLabelsFB,
 ) -> Result
 
-ProcGetSpaceBoundary2DFB :: #type proc "c" (
+ProcGetSpaceBoundary2DFB :: #type proc "system" (
 	session: Session,
 	space: Space,
 	boundary2DOutput: ^Boundary2DFB,
 ) -> Result
 
-ProcGetSpaceRoomLayoutFB :: #type proc "c" (
+ProcGetSpaceRoomLayoutFB :: #type proc "system" (
 	session: Session,
 	space: Space,
 	roomLayoutOutput: ^RoomLayoutFB,
 ) -> Result
 
-ProcPassthroughLayerSetKeyboardHandsIntensityFB :: #type proc "c" (
+ProcPassthroughLayerSetKeyboardHandsIntensityFB :: #type proc "system" (
 	layer: PassthroughLayerFB,
 	intensity: ^PassthroughKeyboardHandsIntensityFB,
 ) -> Result
 
-ProcCreateSpatialAnchorStoreConnectionMSFT :: #type proc "c" (
+ProcCreateSpatialAnchorStoreConnectionMSFT :: #type proc "system" (
 	session: Session,
 	spatialAnchorStore: ^SpatialAnchorStoreConnectionMSFT,
 ) -> Result
 
-ProcDestroySpatialAnchorStoreConnectionMSFT :: #type proc "c" (
+ProcDestroySpatialAnchorStoreConnectionMSFT :: #type proc "system" (
 	spatialAnchorStore: SpatialAnchorStoreConnectionMSFT,
 ) -> Result
 
-ProcPersistSpatialAnchorMSFT :: #type proc "c" (
+ProcPersistSpatialAnchorMSFT :: #type proc "system" (
 	spatialAnchorStore: SpatialAnchorStoreConnectionMSFT,
 	spatialAnchorPersistenceInfo: ^SpatialAnchorPersistenceInfoMSFT,
 ) -> Result
 
-ProcEnumeratePersistedSpatialAnchorNamesMSFT :: #type proc "c" (
+ProcEnumeratePersistedSpatialAnchorNamesMSFT :: #type proc "system" (
 	spatialAnchorStore: SpatialAnchorStoreConnectionMSFT,
 	spatialAnchorNamesCapacityInput: u32,
 	spatialAnchorNamesCountOutput: ^u32,
 	persistedAnchorNames: ^SpatialAnchorPersistenceNameMSFT,
 ) -> Result
 
-ProcCreateSpatialAnchorFromPersistedNameMSFT :: #type proc "c" (
+ProcCreateSpatialAnchorFromPersistedNameMSFT :: #type proc "system" (
 	session: Session,
 	spatialAnchorCreateInfo: ^SpatialAnchorFromPersistedAnchorCreateInfoMSFT,
 	spatialAnchor: ^SpatialAnchorMSFT,
 ) -> Result
 
-ProcUnpersistSpatialAnchorMSFT :: #type proc "c" (
+ProcUnpersistSpatialAnchorMSFT :: #type proc "system" (
 	spatialAnchorStore: SpatialAnchorStoreConnectionMSFT,
 	spatialAnchorPersistenceName: ^SpatialAnchorPersistenceNameMSFT,
 ) -> Result
 
-ProcClearSpatialAnchorStoreMSFT :: #type proc "c" (
+ProcClearSpatialAnchorStoreMSFT :: #type proc "system" (
 	spatialAnchorStore: SpatialAnchorStoreConnectionMSFT,
 ) -> Result
 
-ProcCreateFacialTrackerHTC :: #type proc "c" (
+ProcCreateFacialTrackerHTC :: #type proc "system" (
 	session: Session,
 	createInfo: ^FacialTrackerCreateInfoHTC,
 	facialTracker: ^FacialTrackerHTC,
 ) -> Result
 
-ProcDestroyFacialTrackerHTC :: #type proc "c" (
+ProcDestroyFacialTrackerHTC :: #type proc "system" (
 	facialTracker: FacialTrackerHTC,
 ) -> Result
 
-ProcGetFacialExpressionsHTC :: #type proc "c" (
+ProcGetFacialExpressionsHTC :: #type proc "system" (
 	facialTracker: FacialTrackerHTC,
 	facialExpressions: ^FacialExpressionsHTC,
 ) -> Result
 
-ProcCreatePassthroughHTC :: #type proc "c" (
+ProcCreatePassthroughHTC :: #type proc "system" (
 	session: Session,
 	createInfo: ^PassthroughCreateInfoHTC,
 	passthrough: ^PassthroughHTC,
 ) -> Result
 
-ProcDestroyPassthroughHTC :: #type proc "c" (
+ProcDestroyPassthroughHTC :: #type proc "system" (
 	passthrough: PassthroughHTC,
 ) -> Result
 
-ProcEnumerateViveTrackerPathsHTCX :: #type proc "c" (
+ProcEnumerateViveTrackerPathsHTCX :: #type proc "system" (
 	instance: Instance,
 	pathCapacityInput: u32,
 	pathCountOutput: ^u32,
 	paths: ^ViveTrackerPathsHTCX,
 ) -> Result
 
-ProcSetMarkerTrackingVARJO :: #type proc "c" (
+ProcSetMarkerTrackingVARJO :: #type proc "system" (
 	session: Session,
 	enabled: b32,
 ) -> Result
 
-ProcSetMarkerTrackingTimeoutVARJO :: #type proc "c" (
+ProcSetMarkerTrackingTimeoutVARJO :: #type proc "system" (
 	session: Session,
 	markerId: u64,
 	timeout: Duration,
 ) -> Result
 
-ProcSetMarkerTrackingPredictionVARJO :: #type proc "c" (
+ProcSetMarkerTrackingPredictionVARJO :: #type proc "system" (
 	session: Session,
 	markerId: u64,
 	enabled: b32,
 ) -> Result
 
-ProcGetMarkerSizeVARJO :: #type proc "c" (
+ProcGetMarkerSizeVARJO :: #type proc "system" (
 	session: Session,
 	markerId: u64,
 	size: ^Extent2Df,
 ) -> Result
 
-ProcCreateMarkerSpaceVARJO :: #type proc "c" (
+ProcCreateMarkerSpaceVARJO :: #type proc "system" (
 	session: Session,
 	createInfo: ^MarkerSpaceCreateInfoVARJO,
 	space: ^Space,
 ) -> Result
 
-ProcSetDigitalLensControlALMALENCE :: #type proc "c" (
+ProcSetDigitalLensControlALMALENCE :: #type proc "system" (
 	session: Session,
 	digitalLensControl: ^DigitalLensControlALMALENCE,
 ) -> Result
 
-ProcSetViewOffsetVARJO :: #type proc "c" (
+ProcSetViewOffsetVARJO :: #type proc "system" (
 	session: Session,
 	offset: f32,
 ) -> Result
 
-ProcEnumeratePerformanceMetricsCounterPathsMETA :: #type proc "c" (
+ProcEnumeratePerformanceMetricsCounterPathsMETA :: #type proc "system" (
 	instance: Instance,
 	counterPathCapacityInput: u32,
 	counterPathCountOutput: ^u32,
 	counterPaths: ^Path,
 ) -> Result
 
-ProcSetPerformanceMetricsStateMETA :: #type proc "c" (
+ProcSetPerformanceMetricsStateMETA :: #type proc "system" (
 	session: Session,
 	state: ^PerformanceMetricsStateMETA,
 ) -> Result
 
-ProcGetPerformanceMetricsStateMETA :: #type proc "c" (
+ProcGetPerformanceMetricsStateMETA :: #type proc "system" (
 	session: Session,
 	state: ^PerformanceMetricsStateMETA,
 ) -> Result
 
-ProcQueryPerformanceMetricsCounterMETA :: #type proc "c" (
+ProcQueryPerformanceMetricsCounterMETA :: #type proc "system" (
 	session: Session,
 	counterPath: Path,
 	counter: ^PerformanceMetricsCounterMETA,
 ) -> Result
 
-ProcApplyFoveationHTC :: #type proc "c" (
+ProcApplyFoveationHTC :: #type proc "system" (
 	session: Session,
 	applyInfo: ^FoveationApplyInfoHTC,
 ) -> Result
 
 
 
-GetInstanceProcAddr: ProcGetInstanceProcAddr
 EnumerateApiLayerProperties: ProcEnumerateApiLayerProperties
 EnumerateInstanceExtensionProperties: ProcEnumerateInstanceExtensionProperties
 CreateInstance: ProcCreateInstance
