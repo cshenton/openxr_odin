@@ -21,9 +21,6 @@ main :: proc() {
 		return
 	}
 
-	// Prepass extensions info
-	// TODO: Change flag bits generation to separate flag and flags (get flags from types)
-
 	// Get struct arrays
 	// TODO: Parse struct fields for arrayness and length
 
@@ -364,7 +361,6 @@ gen_enums_bitfield :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xm
 	flags, flag := trim_bitfield_typename(full_name)
 	prefix, suffix := bitfield_name_to_prefix_suffix(full_name)
 
-	// strings.write_string(builder, fmt.aprintf("{} :: distinct bit_set[{}; Flags64]\n", flags, flag))
 	strings.write_string(builder, fmt.aprintf("{} :: enum Flags64 {{\n", flag))
 
 	for child in el.children {
@@ -622,7 +618,23 @@ gen_struct_member :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml
 		type_str = fmt.aprintf("vk.Proc{}", type_str)
 	}
 
-	// This will have pointer / array characters
+	// Handle Arrayness
+	// The XML handles arrayness inconsistently
+	// So el.value will contain [XR_SOME_CONST]
+	// Others will just contains ] and we'll need to drill down further
+	// Handle arrayness where we have the array size in this el
+	if strings.contains(el.value, "[") && strings.contains(el.value, "]") {
+		size_str := strings.trim_prefix(strings.trim_suffix(el.value, "]"), "[")
+		size_str = strings.trim_prefix(size_str, "XR_")
+		type_str = fmt.aprintf("[{}]{}", size_str, type_str)
+	}
+
+	// Handle arrayness where we need to get array size from another el
+	if !strings.contains(el.value, "[") && strings.contains(el.value, "]") {
+		type_str = fmt.aprintf("[1234]{}", type_str)
+	}
+
+	// Handle Pointerness / char* ness
 	ptr_count := strings.count(el.value, "*")
 	if ptr_count == 1 {
 		if type_str == "char" {
@@ -639,8 +651,8 @@ gen_struct_member :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml
 		}
 	}
 
-	if type_str == "char" {
-		type_str = "u8"
+	if strings.has_suffix(type_str, "char") {
+		type_str = fmt.aprintf("{}u8", strings.trim_suffix(type_str, "char"))
 	}
 
 	// Now handle void pointers

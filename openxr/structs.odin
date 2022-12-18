@@ -126,23 +126,23 @@ BaseOutStructure :: struct {
 ApiLayerProperties :: struct {
 	sType : StructureType,
 	next : rawptr,
-	layerName : u8,
+	layerName : [1234]u8,
 	specVersion : Version,
 	layerVersion : u32,
-	description : u8,
+	description : [1234]u8,
 }
 
 ExtensionProperties :: struct {
 	sType : StructureType,
 	next : rawptr,
-	extensionName : u8,
+	extensionName : [1234]u8,
 	extensionVersion : u32,
 }
 
 ApplicationInfo :: struct {
-	applicationName : u8,
+	applicationName : [1234]u8,
 	applicationVersion : u32,
-	engineName : u8,
+	engineName : [1234]u8,
 	engineVersion : u32,
 	apiVersion : Version,
 }
@@ -162,7 +162,7 @@ InstanceProperties :: struct {
 	sType : StructureType,
 	next : rawptr,
 	runtimeVersion : Version,
-	runtimeName : u8,
+	runtimeName : [1234]u8,
 }
 
 SystemGetInfo :: struct {
@@ -176,7 +176,7 @@ SystemProperties :: struct {
 	next : rawptr,
 	systemId : SystemId,
 	vendorId : u32,
-	systemName : u8,
+	systemName : [1234]u8,
 	graphicsProperties : SystemGraphicsProperties,
 	trackingProperties : SystemTrackingProperties,
 }
@@ -505,7 +505,7 @@ EventDataBaseHeader :: struct {
 EventDataBuffer :: struct {
 	sType : StructureType,
 	next : rawptr,
-	varying : u8,
+	varying : [4000]u8,
 }
 
 EventDataEventsLost :: struct {
@@ -612,8 +612,8 @@ HapticActionInfo :: struct {
 ActionSetCreateInfo :: struct {
 	sType : StructureType,
 	next : rawptr,
-	actionSetName : u8,
-	localizedActionSetName : u8,
+	actionSetName : [1234]u8,
+	localizedActionSetName : [1234]u8,
 	priority : u32,
 }
 
@@ -677,11 +677,11 @@ InteractionProfileState :: struct {
 ActionCreateInfo :: struct {
 	sType : StructureType,
 	next : rawptr,
-	actionName : u8,
+	actionName : [1234]u8,
 	actionType : ActionType,
 	countSubactionPaths : u32,
 	subactionPaths : ^Path,
-	localizedActionName : u8,
+	localizedActionName : [1234]u8,
 }
 
 InstanceCreateInfoAndroidKHR :: struct {
@@ -943,7 +943,7 @@ SpatialGraphNodeSpaceCreateInfoMSFT :: struct {
 	sType : StructureType,
 	next : rawptr,
 	nodeType : SpatialGraphNodeTypeMSFT,
-	nodeId : u8,
+	nodeId : [GUID_SIZE_MSFT]u8,
 	pose : Posef,
 }
 
@@ -963,7 +963,7 @@ SpatialGraphNodeBindingPropertiesGetInfoMSFT :: struct {
 SpatialGraphNodeBindingPropertiesMSFT :: struct {
 	sType : StructureType,
 	next : rawptr,
-	nodeId : u8,
+	nodeId : [GUID_SIZE_MSFT]u8,
 	poseInNodeSpace : Posef,
 }
 
@@ -1224,8 +1224,8 @@ ControllerModelKeyStateMSFT :: struct {
 ControllerModelNodePropertiesMSFT :: struct {
 	sType : StructureType,
 	next : rawptr,
-	parentNodeName : u8,
-	nodeName : u8,
+	parentNodeName : [MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT]u8,
+	nodeName : [MAX_CONTROLLER_MODEL_NODE_NAME_SIZE_MSFT]u8,
 }
 
 ControllerModelPropertiesMSFT :: struct {
@@ -1251,7 +1251,7 @@ ControllerModelStateMSFT :: struct {
 }
 
 UuidMSFT :: struct {
-	bytes : u8,
+	bytes : [16]u8,
 }
 
 SceneObserverCreateInfoMSFT :: struct {
@@ -1595,7 +1595,7 @@ HandTrackingAimStateFB :: struct {
 }
 
 HandCapsuleFB :: struct {
-	points : Vector3f,
+	points : [1234]Vector3f,
 	radius : f32,
 	joint : HandJointEXT,
 }
@@ -1603,7 +1603,7 @@ HandCapsuleFB :: struct {
 HandTrackingCapsulesStateFB :: struct {
 	sType : StructureType,
 	next : rawptr,
-	capsules : HandCapsuleFB,
+	capsules : [1234]HandCapsuleFB,
 }
 
 RenderModelPathInfoFB :: struct {
@@ -1616,7 +1616,7 @@ RenderModelPropertiesFB :: struct {
 	sType : StructureType,
 	next : rawptr,
 	vendorId : u32,
-	modelName : u8,
+	modelName : [MAX_RENDER_MODEL_NAME_SIZE_FB]u8,
 	modelKey : RenderModelKeyFB,
 	modelVersion : u32,
 	flags : RenderModelFlagsFB,
@@ -1809,7 +1809,7 @@ KeyboardTrackingDescriptionFB :: struct {
 	trackedKeyboardId : u64,
 	size : Vector3f,
 	flags : KeyboardTrackingFlagsFB,
-	name : u8,
+	name : [MAX_KEYBOARD_TRACKING_NAME_SIZE_FB]u8,
 }
 
 KeyboardSpaceCreateInfoFB :: struct {
@@ -1937,13 +1937,13 @@ PassthroughStyleFB :: struct {
 PassthroughColorMapMonoToRgbaFB :: struct {
 	sType : StructureType,
 	next : rawptr,
-	textureColorMap : Color4f,
+	textureColorMap : [PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB]Color4f,
 }
 
 PassthroughColorMapMonoToMonoFB :: struct {
 	sType : StructureType,
 	next : rawptr,
-	textureColorMap : u8,
+	textureColorMap : [PASSTHROUGH_COLOR_MAP_MONO_SIZE_FB]u8,
 }
 
 PassthroughBrightnessContrastSaturationFB :: struct {
@@ -1968,7 +1968,7 @@ PassthroughKeyboardHandsIntensityFB :: struct {
 }
 
 SpatialAnchorPersistenceNameMSFT :: struct {
-	name : u8,
+	name : [1234]u8,
 }
 
 SpatialAnchorPersistenceInfoMSFT :: struct {
@@ -2097,7 +2097,7 @@ MarkerSpaceCreateInfoVARJO :: struct {
 }
 
 UuidEXT :: struct {
-	data : u8,
+	data : [1234]u8,
 }
 
 DigitalLensControlALMALENCE :: struct {
