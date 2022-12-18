@@ -126,23 +126,23 @@ BaseOutStructure :: struct {
 ApiLayerProperties :: struct {
 	sType : StructureType,
 	next : rawptr,
-	layerName : [1234]u8,
+	layerName : [MAX_API_LAYER_NAME_SIZE]u8,
 	specVersion : Version,
 	layerVersion : u32,
-	description : [1234]u8,
+	description : [MAX_API_LAYER_DESCRIPTION_SIZE]u8,
 }
 
 ExtensionProperties :: struct {
 	sType : StructureType,
 	next : rawptr,
-	extensionName : [1234]u8,
+	extensionName : [MAX_EXTENSION_NAME_SIZE]u8,
 	extensionVersion : u32,
 }
 
 ApplicationInfo :: struct {
-	applicationName : [1234]u8,
+	applicationName : [MAX_APPLICATION_NAME_SIZE]u8,
 	applicationVersion : u32,
-	engineName : [1234]u8,
+	engineName : [MAX_ENGINE_NAME_SIZE]u8,
 	engineVersion : u32,
 	apiVersion : Version,
 }
@@ -162,7 +162,7 @@ InstanceProperties :: struct {
 	sType : StructureType,
 	next : rawptr,
 	runtimeVersion : Version,
-	runtimeName : [1234]u8,
+	runtimeName : [MAX_RUNTIME_NAME_SIZE]u8,
 }
 
 SystemGetInfo :: struct {
@@ -176,7 +176,7 @@ SystemProperties :: struct {
 	next : rawptr,
 	systemId : SystemId,
 	vendorId : u32,
-	systemName : [1234]u8,
+	systemName : [MAX_SYSTEM_NAME_SIZE]u8,
 	graphicsProperties : SystemGraphicsProperties,
 	trackingProperties : SystemTrackingProperties,
 }
@@ -612,8 +612,8 @@ HapticActionInfo :: struct {
 ActionSetCreateInfo :: struct {
 	sType : StructureType,
 	next : rawptr,
-	actionSetName : [1234]u8,
-	localizedActionSetName : [1234]u8,
+	actionSetName : [MAX_ACTION_SET_NAME_SIZE]u8,
+	localizedActionSetName : [MAX_LOCALIZED_ACTION_SET_NAME_SIZE]u8,
 	priority : u32,
 }
 
@@ -677,11 +677,11 @@ InteractionProfileState :: struct {
 ActionCreateInfo :: struct {
 	sType : StructureType,
 	next : rawptr,
-	actionName : [1234]u8,
+	actionName : [MAX_ACTION_NAME_SIZE]u8,
 	actionType : ActionType,
 	countSubactionPaths : u32,
 	subactionPaths : ^Path,
-	localizedActionName : [1234]u8,
+	localizedActionName : [MAX_LOCALIZED_ACTION_NAME_SIZE]u8,
 }
 
 InstanceCreateInfoAndroidKHR :: struct {
@@ -1595,7 +1595,7 @@ HandTrackingAimStateFB :: struct {
 }
 
 HandCapsuleFB :: struct {
-	points : [1234]Vector3f,
+	points : [HAND_TRACKING_CAPSULE_POINT_COUNT_FB]Vector3f,
 	radius : f32,
 	joint : HandJointEXT,
 }
@@ -1603,7 +1603,7 @@ HandCapsuleFB :: struct {
 HandTrackingCapsulesStateFB :: struct {
 	sType : StructureType,
 	next : rawptr,
-	capsules : [1234]HandCapsuleFB,
+	capsules : [HAND_TRACKING_CAPSULE_COUNT_FB]HandCapsuleFB,
 }
 
 RenderModelPathInfoFB :: struct {
@@ -1968,7 +1968,7 @@ PassthroughKeyboardHandsIntensityFB :: struct {
 }
 
 SpatialAnchorPersistenceNameMSFT :: struct {
-	name : [1234]u8,
+	name : [MAX_SPATIAL_ANCHOR_NAME_SIZE_MSFT]u8,
 }
 
 SpatialAnchorPersistenceInfoMSFT :: struct {
@@ -2097,7 +2097,7 @@ MarkerSpaceCreateInfoVARJO :: struct {
 }
 
 UuidEXT :: struct {
-	data : [1234]u8,
+	data : [UUID_SIZE_EXT]u8,
 }
 
 DigitalLensControlALMALENCE :: struct {

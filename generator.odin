@@ -21,9 +21,6 @@ main :: proc() {
 		return
 	}
 
-	// Get struct arrays
-	// TODO: Parse struct fields for arrayness and length
-
 	// Generate functions
 	// TODO: Generate dummy function pointer types
 	// TODO: Generate function signatures
@@ -631,7 +628,9 @@ gen_struct_member :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml
 
 	// Handle arrayness where we need to get array size from another el
 	if !strings.contains(el.value, "[") && strings.contains(el.value, "]") {
-		type_str = fmt.aprintf("[1234]{}", type_str)
+		size_str := doc.elements[el.children[2]].value
+		size_str = strings.trim_prefix(size_str, "XR_")
+		type_str = fmt.aprintf("[{}]{}", size_str, type_str)
 	}
 
 	// Handle Pointerness / char* ness
