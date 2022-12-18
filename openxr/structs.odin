@@ -153,9 +153,9 @@ InstanceCreateInfo :: struct {
 	createFlags : InstanceCreateFlags,
 	applicationInfo : ApplicationInfo,
 	enabledApiLayerCount : u32,
-	enabledApiLayerNames : ^^u8,
+	enabledApiLayerNames : [^]cstring,
 	enabledExtensionCount : u32,
-	enabledExtensionNames : ^^u8,
+	enabledExtensionNames : [^]cstring,
 }
 
 InstanceProperties :: struct {
@@ -703,21 +703,21 @@ DebugUtilsObjectNameInfoEXT :: struct {
 	next : rawptr,
 	objectType : ObjectType,
 	objectHandle : u64,
-	objectName : ^u8,
+	objectName : cstring,
 }
 
 DebugUtilsLabelEXT :: struct {
 	sType : StructureType,
 	next : rawptr,
-	labelName : ^u8,
+	labelName : cstring,
 }
 
 DebugUtilsMessengerCallbackDataEXT :: struct {
 	sType : StructureType,
 	next : rawptr,
-	messageId : ^u8,
-	functionName : ^u8,
-	message : ^u8,
+	messageId : cstring,
+	functionName : cstring,
+	message : cstring,
 	objectCount : u32,
 	objects : ^DebugUtilsObjectNameInfoEXT,
 	sessionLabelCount : u32,
@@ -1778,7 +1778,7 @@ SemanticLabelsFB :: struct {
 	next : rawptr,
 	bufferCapacityInput : u32,
 	bufferCountOutput : u32,
-	buffer : ^u8,
+	buffer : cstring,
 }
 
 RoomLayoutFB :: struct {

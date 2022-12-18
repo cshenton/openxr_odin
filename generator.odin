@@ -6,6 +6,7 @@ package openxr_odin
 
 import "core:encoding/xml"
 import "core:fmt"
+import "core:strconv"
 import "core:strings"
 import "core:os"
 
@@ -27,12 +28,12 @@ main :: proc() {
 
 	// Get struct arrays
 	// TODO: Parse struct fields for arrayness and length
-	
+
 	// Generate functions
 	// TODO: Generate dummy function pointer types
 	// TODO: Generate function signatures
 	// TODO: Generate CreateFooBar : ProcCreateFooBar members
-	
+
 	// Write loader
 	// TODO: Link GetInstanceProcAddress
 	// TODO: Gather all instance, device functions and write procs to load in fn pointers
@@ -49,6 +50,14 @@ el_get_attrib :: proc(el: xml.Element, key: string) -> string {
 		return attr.val
 	}
 	panic(fmt.tprintln("attribute not found on element:", key))
+}
+
+el_has_attrib :: proc(el: xml.Element, key: string) -> bool {
+	for attr in el.attribs {
+		if attr.key != key {continue}
+		return true
+	}
+	return false
 }
 
 el_try_get_attrib :: proc(el: xml.Element, key: string) -> (string, bool) {
@@ -185,23 +194,82 @@ gen_extension_constant :: proc(builder: ^strings.Builder, doc: ^xml.Document, el
 //                                               ENUMS.ODIN                                                                //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Extended_Enum :: struct {
+	name:  string,
+	value: int,
+}
+
 // Generates the full enums.odin file and writes it out
 gen_enums_odin :: proc(doc: ^xml.Document) {
 	builder := strings.builder_make()
 	strings.write_string(&builder, "package openxr\n\n")
 	strings.write_string(&builder, "import \"core:c\"\n\n")
 
+	// Get extension enum values
+	ext_map: map[string][dynamic]Extended_Enum
+	for id in doc.elements[0].children {
+		el := doc.elements[id]
+		if el.ident != "extensions" {continue}
+		ext_map = get_enum_extensions(doc, el)
+	}
+
 	for id in doc.elements[0].children {
 		el := doc.elements[id]
 		if el.ident != "enums" {continue}
-		gen_enums(&builder, doc, el)
+		gen_enums(&builder, doc, el, ext_map)
 	}
+
 
 	os.write_entire_file("openxr/enums.odin", builder.buf[:])
 }
 
+get_enum_extensions :: proc(doc: ^xml.Document, el: xml.Element) -> (ext_map: map[string][dynamic]Extended_Enum) {
+	for id in el.children {
+		get_enum_extension(doc, doc.elements[id], &ext_map)
+	}
+
+	return ext_map
+}
+
+get_enum_extension :: proc(doc: ^xml.Document, el: xml.Element, ext_map: ^map[string][dynamic]Extended_Enum) {
+	ext_number, ok := strconv.parse_int(el_get_attrib(el, "number"), 10)
+	assert(ok)
+
+	require_el := doc.elements[el.children[0]]
+	assert(require_el.ident == "require")
+
+	for id in require_el.children {
+		child_el := doc.elements[id]
+		if child_el.ident != "enum" {continue}
+		if !el_has_attrib(child_el, "extends") {continue}
+		extends := el_get_attrib(child_el, "extends")
+		if extends == "XrSwapchainUsageFlagBits" {continue} 	// Special case bitfield extension
+		if el_has_attrib(child_el, "alias") {continue} 	// Skip Aliases
+
+		name := el_get_attrib(child_el, "name")
+		offset, ok := strconv.parse_int(el_get_attrib(child_el, "offset"), 10)
+		assert(ok)
+
+		if !(extends in ext_map) {
+			ext_map[extends] = make([dynamic]Extended_Enum, 0)
+		}
+
+		// The strategy for valuing extended enums is
+		// 1000000000 Offset for all extensions
+		// + (ext_number - 1) * 1000, Offset for each extension
+		// offset, per enum value offset
+		value := 1000000000 + 1000 * (ext_number - 1) + offset
+		append(&ext_map[extends], Extended_Enum{name, value})
+	}
+}
+
 // Generates odin code from an <enums> element
-gen_enums :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+gen_enums :: proc(
+	builder: ^strings.Builder,
+	doc: ^xml.Document,
+	el: xml.Element,
+	ext_map: map[string][dynamic]Extended_Enum,
+) {
 	el_name := el_get_attrib(el, "name")
 
 	// Handle API Constants special case
@@ -210,7 +278,7 @@ gen_enums :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element
 	// Handle actual enums
 	el_type := el_get_attrib(el, "type")
 	if el_type == "enum" {
-		gen_enums_enum(builder, doc, el)
+		gen_enums_enum(builder, doc, el, ext_map)
 		return
 	} else if el_type == "bitmask" {
 		gen_enums_bitfield(builder, doc, el)
@@ -222,7 +290,12 @@ gen_enums :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element
 
 
 // Generates an odin enum type from an <enums> element of type="enum"
-gen_enums_enum :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+gen_enums_enum :: proc(
+	builder: ^strings.Builder,
+	doc: ^xml.Document,
+	el: xml.Element,
+	ext_map: map[string][dynamic]Extended_Enum,
+) {
 	full_name := el_get_attrib(el, "name")
 	name := strings.trim_prefix(full_name, "Xr")
 	prefix, suffix := enum_name_to_prefix_suffix(full_name)
@@ -231,6 +304,15 @@ gen_enums_enum :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.El
 
 	for child in el.children {
 		gen_enums_enum_value(builder, doc, doc.elements[child], prefix, suffix)
+	}
+
+	// Now write any extension values
+	extended_enums: [dynamic]Extended_Enum
+	if full_name in ext_map {
+		extended_enums = ext_map[full_name]
+	}
+	for ext_enum in extended_enums {
+		gen_enums_enum_extended(builder, ext_enum, prefix, suffix)
 	}
 
 	strings.write_string(builder, "}\n\n")
@@ -252,6 +334,13 @@ gen_enums_enum_value :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: 
 	strings.write_string(builder, "\n")
 }
 
+gen_enums_enum_extended :: proc(builder: ^strings.Builder, ext_enum: Extended_Enum, prefix, suffix: string) {
+	name := strings.trim_prefix(strings.trim_suffix(ext_enum.name, suffix), prefix)
+	value := ext_enum.value
+	strings.write_string(builder, fmt.aprintf("\t{} = {},", name, value))
+	strings.write_string(builder, "\n")
+}
+
 // Generates an odin bitfield type from an <enums> element of type="bitmask"
 gen_enums_bitfield :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
 	full_name := el_get_attrib(el, "name")
@@ -264,6 +353,8 @@ gen_enums_bitfield :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xm
 	for child in el.children {
 		gen_enums_bitfield_value(builder, doc, doc.elements[child], prefix, suffix)
 	}
+
+	// Handle XrSwapchainUsageFlagBits special case
 
 	strings.write_string(builder, "}\n\n")
 }
@@ -407,7 +498,7 @@ TYPE_ALIASES := map[string]string {
 	"uint64_t" = "u64",
 	"XrBool32" = "b32",
 	"int"      = "c.int",
-	"char"     = "u8",
+	// "char"     = "u8",
 }
 
 // Mapping from C to odin type names
@@ -496,10 +587,22 @@ gen_struct_member :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml
 	// This will have pointer / array characters
 	ptr_count := strings.count(el.value, "*")
 	if ptr_count == 1 {
-		type_str = fmt.aprintf("^{}", type_str)
+		if type_str == "char" {
+			type_str = "cstring"
+		} else {
+			type_str = fmt.aprintf("^{}", type_str)
+		}
 	}
 	if ptr_count == 2 {
-		type_str = fmt.aprintf("^^{}", type_str)
+		if type_str == "char" {
+			type_str = "[^]cstring"
+		} else {
+			type_str = fmt.aprintf("^^{}", type_str)
+		}
+	}
+
+	if type_str == "char" {
+		type_str = "u8"
 	}
 
 	// Now handle void pointers
