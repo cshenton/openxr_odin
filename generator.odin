@@ -22,8 +22,6 @@ main :: proc() {
 	}
 
 	// Prepass extensions info
-	// TODO: Get Constants from extensions
-	// TODO: Handle XrSwapchainUsageFlagBits special case (only vendor extended bitmask)
 	// TODO: Change flag bits generation to separate flag and flags (get flags from types)
 
 	// Get struct arrays
@@ -224,10 +222,18 @@ gen_enums_odin :: proc(doc: ^xml.Document) {
 		ext_map = get_enum_extensions(doc, el)
 	}
 
+	// Generate enums using <enums> element
 	for id in doc.elements[0].children {
 		el := doc.elements[id]
 		if el.ident != "enums" {continue}
 		gen_enums(&builder, doc, el, ext_map)
+	}
+
+	// Now generate our flags types
+	for id in doc.elements[0].children {
+		el := doc.elements[id]
+		if el.ident != "types" {continue}
+		gen_enums_types(&builder, doc, el)
 	}
 
 
@@ -358,7 +364,7 @@ gen_enums_bitfield :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xm
 	flags, flag := trim_bitfield_typename(full_name)
 	prefix, suffix := bitfield_name_to_prefix_suffix(full_name)
 
-	strings.write_string(builder, fmt.aprintf("{} :: distinct bit_set[{}; Flags64]\n", flags, flag))
+	// strings.write_string(builder, fmt.aprintf("{} :: distinct bit_set[{}; Flags64]\n", flags, flag))
 	strings.write_string(builder, fmt.aprintf("{} :: enum Flags64 {{\n", flag))
 
 	for child in el.children {
@@ -366,6 +372,10 @@ gen_enums_bitfield :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xm
 	}
 
 	// Handle XrSwapchainUsageFlagBits special case
+	if full_name == "XrSwapchainUsageFlagBits" {
+		strings.write_string(builder, "\tINPUT_ATTACHMENT_MND = 7,\n")
+	}
+
 
 	strings.write_string(builder, "}\n\n")
 }
@@ -440,6 +450,23 @@ bitfield_name_to_prefix_suffix :: proc(name: string) -> (string, string) {
 	prefix = fmt.aprintf("{}_", strings.to_screaming_snake_case(prefix))
 	suffix = suffix == "" ? "_BIT" : fmt.aprintf("_BIT_{}", suffix)
 	return prefix, suffix
+}
+
+// Generates odin code from an <enums> element
+gen_enums_types :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	for id in el.children {
+		gen_enums_type(builder, doc, doc.elements[id])
+	}
+}
+
+gen_enums_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	category, ok := el_try_get_attrib(el, "category")
+	if category != "bitmask" {return}
+	bitvalues := el_get_attrib(el, "bitvalues")
+
+	flags, flag := trim_bitfield_typename(bitvalues)
+
+	strings.write_string(builder, fmt.aprintf("{} :: distinct bit_set[{}; Flags64]\n", flags, flag))
 }
 
 

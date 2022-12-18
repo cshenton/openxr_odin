@@ -553,21 +553,17 @@ HandForearmJointULTRALEAP :: enum c.int {
 	ELBOW = 26,
 }
 
-InstanceCreateFlags :: distinct bit_set[InstanceCreateFlag; Flags64]
 InstanceCreateFlag :: enum Flags64 {
 }
 
-SessionCreateFlags :: distinct bit_set[SessionCreateFlag; Flags64]
 SessionCreateFlag :: enum Flags64 {
 }
 
-SwapchainCreateFlags :: distinct bit_set[SwapchainCreateFlag; Flags64]
 SwapchainCreateFlag :: enum Flags64 {
 	PROTECTED_CONTENT = 0, // Content will be protected from CPU access
 	STATIC_IMAGE = 1, // Only one image will be acquired from this swapchain over its lifetime
 }
 
-SwapchainUsageFlags :: distinct bit_set[SwapchainUsageFlag; Flags64]
 SwapchainUsageFlag :: enum Flags64 {
 	COLOR_ATTACHMENT = 0, // Specifies that the image may: be a color rendering target.
 	DEPTH_STENCIL_ATTACHMENT = 1, // Specifies that the image may: be a depth/stencil rendering target.
@@ -576,9 +572,9 @@ SwapchainUsageFlag :: enum Flags64 {
 	TRANSFER_DST = 4, // Specifies that the image may: be used as the destination of a transfer operation.
 	SAMPLED = 5, // Specifies that the image may: be sampled by a shader.
 	MUTABLE_FORMAT = 6, // Specifies that the image may: be reinterpreted as another image format.
+	INPUT_ATTACHMENT_MND = 7,
 }
 
-ViewStateFlags :: distinct bit_set[ViewStateFlag; Flags64]
 ViewStateFlag :: enum Flags64 {
 	ORIENTATION_VALID = 0, // Indicates validity of all slink:XrView orientations
 	POSITION_VALID = 1, // Indicates validity of all slink:XrView positions
@@ -586,14 +582,12 @@ ViewStateFlag :: enum Flags64 {
 	POSITION_TRACKED = 3, // Indicates whether all slink:XrView positions are actively tracked
 }
 
-CompositionLayerFlags :: distinct bit_set[CompositionLayerFlag; Flags64]
 CompositionLayerFlag :: enum Flags64 {
 	CORRECT_CHROMATIC_ABERRATION = 0, // Enables chromatic aberration correction when not done by default. This flag has no effect on any known conformant runtime, and is planned for deprecation for OpenXR 1.1
 	BLEND_TEXTURE_SOURCE_ALPHA = 1, // Enables the layer texture alpha channel.
 	UNPREMULTIPLIED_ALPHA = 2, // Indicates the texture color channels have not been premultiplied by the texture alpha channel.
 }
 
-SpaceLocationFlags :: distinct bit_set[SpaceLocationFlag; Flags64]
 SpaceLocationFlag :: enum Flags64 {
 	ORIENTATION_VALID = 0, // Indicates that the pname:orientation member contains valid data
 	POSITION_VALID = 1, // Indicates that the pname:position member contains valid data
@@ -601,28 +595,23 @@ SpaceLocationFlag :: enum Flags64 {
 	POSITION_TRACKED = 3, // Indicates whether pname:pose member contains an actively tracked pname:position
 }
 
-SpaceVelocityFlags :: distinct bit_set[SpaceVelocityFlag; Flags64]
 SpaceVelocityFlag :: enum Flags64 {
 	LINEAR_VALID = 0, // Indicates that the pname:linearVelocity member contains valid data. Applications must: not read the pname:linearVelocity field if this flag is unset.
 	ANGULAR_VALID = 1, // Indicates that the pname:angularVelocity member contains valid data. Applications must: not read the pname:angularVelocity field if this flag is unset.
 }
 
-InputSourceLocalizedNameFlags :: distinct bit_set[InputSourceLocalizedNameFlag; Flags64]
 InputSourceLocalizedNameFlag :: enum Flags64 {
 	USER_PATH = 0, // Asks for the part of the string which indicates the top level user path the source represents
 	INTERACTION_PROFILE = 1, // Asks for the part of the string which represents the interaction profile of the source
 	COMPONENT = 2, // Asks for the part of the string which represents the component on the device which needs to be interacted with
 }
 
-VulkanInstanceCreateFlagsKHR :: distinct bit_set[VulkanInstanceCreateFlagKHR; Flags64]
 VulkanInstanceCreateFlagKHR :: enum Flags64 {
 }
 
-VulkanDeviceCreateFlagsKHR :: distinct bit_set[VulkanDeviceCreateFlagKHR; Flags64]
 VulkanDeviceCreateFlagKHR :: enum Flags64 {
 }
 
-DebugUtilsMessageSeverityFlagsEXT :: distinct bit_set[DebugUtilsMessageSeverityFlagEXT; Flags64]
 DebugUtilsMessageSeverityFlagEXT :: enum Flags64 {
 	VERBOSE = 0, // Most verbose output severity, typically used for debugging.
 	INFO = 4, // General info message
@@ -630,7 +619,6 @@ DebugUtilsMessageSeverityFlagEXT :: enum Flags64 {
 	ERROR = 12, // Indicates that the item is definitely related to erroneous behavior.
 }
 
-DebugUtilsMessageTypeFlagsEXT :: distinct bit_set[DebugUtilsMessageTypeFlagEXT; Flags64]
 DebugUtilsMessageTypeFlagEXT :: enum Flags64 {
 	GENERAL = 0, // Indicates this is a general message
 	VALIDATION = 1, // Indicates the message is related to a validation message
@@ -638,12 +626,10 @@ DebugUtilsMessageTypeFlagEXT :: enum Flags64 {
 	CONFORMANCE = 3, // Indicates the message is related to a non-conformant runtime result
 }
 
-OverlayMainSessionFlagsEXTX :: distinct bit_set[OverlayMainSessionFlagEXTX; Flags64]
 OverlayMainSessionFlagEXTX :: enum Flags64 {
 	ENABLED_COMPOSITION_LAYER_INFO_DEPTH = 0, // Indicates the main session enabled `XR_KHR_composition_layer_depth`
 }
 
-OverlaySessionCreateFlagsEXTX :: distinct bit_set[OverlaySessionCreateFlagEXTX; Flags64]
 OverlaySessionCreateFlagEXTX :: enum Flags64 {
 }
 
@@ -705,28 +691,23 @@ MeshComputeLodMSFT :: enum c.int {
 	UNLIMITED = 4,
 }
 
-AndroidSurfaceSwapchainFlagsFB :: distinct bit_set[AndroidSurfaceSwapchainFlagFB; Flags64]
 AndroidSurfaceSwapchainFlagFB :: enum Flags64 {
 	SYNCHRONOUS = 0, // Create the underlying BufferQueue in synchronous mode
 	USE_TIMESTAMPS = 1, // Acquire most recent buffer whose presentation timestamp is not greater than display time of final composited frame
 }
 
-CompositionLayerImageLayoutFlagsFB :: distinct bit_set[CompositionLayerImageLayoutFlagFB; Flags64]
 CompositionLayerImageLayoutFlagFB :: enum Flags64 {
 	VERTICAL_FLIP = 0, // The coordinate origin of the swapchain image must be considered to be flipped vertically.
 }
 
-SwapchainCreateFoveationFlagsFB :: distinct bit_set[SwapchainCreateFoveationFlagFB; Flags64]
 SwapchainCreateFoveationFlagFB :: enum Flags64 {
 	SCALED_BIN = 0, // Explicitly create the swapchain with scaled bin foveation support. The application must ensure that the swapchain is using the OpenGL graphics API and that the QCOM_texture_foveated extension is supported and enabled.
 	FRAGMENT_DENSITY_MAP = 1, // Explicitly create the swapchain with fragment density map foveation support. The application must ensure that the swapchain is using the Vulkan graphics API and that the VK_EXT_fragment_density_map extension is supported and enabled.
 }
 
-SwapchainStateFoveationFlagsFB :: distinct bit_set[SwapchainStateFoveationFlagFB; Flags64]
 SwapchainStateFoveationFlagFB :: enum Flags64 {
 }
 
-CompositionLayerSecureContentFlagsFB :: distinct bit_set[CompositionLayerSecureContentFlagFB; Flags64]
 CompositionLayerSecureContentFlagFB :: enum Flags64 {
 	EXCLUDE_LAYER = 0, // Indicates the layer will only be visible inside the HMD, and not visible to external sources
 	REPLACE_LAYER = 1, // Indicates the layer will be displayed inside the HMD, but replaced by proxy content when written to external sources
@@ -760,7 +741,6 @@ WindingOrderFB :: enum c.int {
 	CCW = 2, // Counter-clockwise winding order
 }
 
-TriangleMeshFlagsFB :: distinct bit_set[TriangleMeshFlagFB; Flags64]
 TriangleMeshFlagFB :: enum Flags64 {
 	MUTABLE = 0, // The triangle mesh is mutable (can be modified after it is created).
 }
@@ -772,13 +752,11 @@ PassthroughLayerPurposeFB :: enum c.int {
 	TRACKED_KEYBOARD_MASKED_HANDS = 1000203002,
 }
 
-PassthroughFlagsFB :: distinct bit_set[PassthroughFlagFB; Flags64]
 PassthroughFlagFB :: enum Flags64 {
 	IS_RUNNING_AT_CREATION = 0, // The object (passthrough, layer) is running at creation.
 	LAYER_DEPTH = 1, // The passthrough system sends depth information to the compositor. Only applicable to layer objects.
 }
 
-PassthroughStateChangedFlagsFB :: distinct bit_set[PassthroughStateChangedFlagFB; Flags64]
 PassthroughStateChangedFlagFB :: enum Flags64 {
 	REINIT_REQUIRED = 0, // Passthrough system requires reinitialization.
 	NON_RECOVERABLE_ERROR = 1, // Non-recoverable error has occurred. A device reboot or a firmware update may be required.
@@ -786,7 +764,6 @@ PassthroughStateChangedFlagFB :: enum Flags64 {
 	RESTORED_ERROR = 3, // The runtime has recovered from a previous error and is functioning normally.
 }
 
-PassthroughCapabilityFlagsFB :: distinct bit_set[PassthroughCapabilityFlagFB; Flags64]
 PassthroughCapabilityFlagFB :: enum Flags64 {
 	XR_PASSTHROUGH_CAPABILITY = 0, // The system supports passthrough.
 	COLOR = 1, // The system can show passthrough with realistic colors. ename:XR_PASSTHROUGH_CAPABILITY_BIT_FB must: be set if ename:XR_PASSTHROUGH_CAPABILITY_COLOR_BIT_FB is set.
@@ -807,7 +784,6 @@ SpacePersistenceModeFB :: enum c.int {
 	INDEFINITE = 1, // Store slink:XrSpace indefinitely, or until erased
 }
 
-HandTrackingAimFlagsFB :: distinct bit_set[HandTrackingAimFlagFB; Flags64]
 HandTrackingAimFlagFB :: enum Flags64 {
 	COMPUTED = 0, // Aiming data is computed from additional sources beyond the hand data in the base structure
 	VALID = 1, // Aiming data is valid
@@ -820,7 +796,6 @@ HandTrackingAimFlagFB :: enum Flags64 {
 	MENU_PRESSED = 8, // System menu gesture is active
 }
 
-KeyboardTrackingFlagsFB :: distinct bit_set[KeyboardTrackingFlagFB; Flags64]
 KeyboardTrackingFlagFB :: enum Flags64 {
 	EXISTS = 0, // indicates that the system has a physically tracked keyboard to report.  If not set then no other bits should be considered to be valid or meaningful.  If set either XR_KEYBOARD_TRACKING_LOCAL_BIT_FB or XR_KEYBOARD_TRACKING_REMOTE_BIT_FB must also be set.
 	LOCAL = 1, // indicates that the physically tracked keyboard is intended to be used in a local pairing with the system.  Mutally exclusive with XR_KEYBOARD_TRACKING_REMOTE_BIT_FB.
@@ -828,18 +803,15 @@ KeyboardTrackingFlagFB :: enum Flags64 {
 	CONNECTED = 3, // indicates that the physically tracked keyboard is actively connected to the headset and capable of sending key data
 }
 
-KeyboardTrackingQueryFlagsFB :: distinct bit_set[KeyboardTrackingQueryFlagFB; Flags64]
 KeyboardTrackingQueryFlagFB :: enum Flags64 {
 	LOCAL = 1, // indicates the query is for the physically tracked keyboard that is intended to be used in a local pairing with the System. Mutally exclusive with XR_KEYBOARD_TRACKING_QUERY_REMOTE_BIT_FB.
 	REMOTE = 2, // indicates the query is for the physically tracked keyboard that may be connected to a separate remote computing device. Mutally exclusive with XR_KEYBOARD_TRACKING_QUERY_LOCAL_BIT_FB.
 }
 
-CompositionLayerSpaceWarpInfoFlagsFB :: distinct bit_set[CompositionLayerSpaceWarpInfoFlagFB; Flags64]
 CompositionLayerSpaceWarpInfoFlagFB :: enum Flags64 {
 	FRAME_SKIP = 0, // Skip current frame's space warp extrapolation
 }
 
-RenderModelFlagsFB :: distinct bit_set[RenderModelFlagFB; Flags64]
 RenderModelFlagFB :: enum Flags64 {
 	SUPPORTS_GLTF_2_0_SUBSET_1 = 0, // Minimal level of support.  Can only contain a single mesh.  Can only contain a single texture.  Can not contain transparency.  Assumes unlit rendering.  Requires Extension KHR_texturebasisu.
 	SUPPORTS_GLTF_2_0_SUBSET_2 = 1, // All of XR_RENDER_MODEL_SUPPORTS_GLTF_2_0_SUBSET_1_BIT_FB support plus: Multiple meshes. Multiple Textures. Texture Transparency.
@@ -912,12 +884,10 @@ LipExpressionHTC :: enum c.int {
 	TONGUE_DOWNLEFT_MORPH = 36,
 }
 
-DigitalLensControlFlagsALMALENCE :: distinct bit_set[DigitalLensControlFlagALMALENCE; Flags64]
 DigitalLensControlFlagALMALENCE :: enum Flags64 {
 	PROCESSING_DISABLE = 0, // disables Digital Lens processing of render textures
 }
 
-CompositionLayerSettingsFlagsFB :: distinct bit_set[CompositionLayerSettingsFlagFB; Flags64]
 CompositionLayerSettingsFlagFB :: enum Flags64 {
 	NORMAL_SUPER_SAMPLING = 0, // Indicates compositor may: use layer texture supersampling.
 	QUALITY_SUPER_SAMPLING = 1, // Indicates compositor may: use high quality layer texture supersampling.
@@ -925,7 +895,6 @@ CompositionLayerSettingsFlagFB :: enum Flags64 {
 	QUALITY_SHARPENING = 3, // Indicates compositor may: use high quality layer texture sharpening.
 }
 
-PerformanceMetricsCounterFlagsMETA :: distinct bit_set[PerformanceMetricsCounterFlagMETA; Flags64]
 PerformanceMetricsCounterFlagMETA :: enum Flags64 {
 	ANY_VALUE_VALID = 0, // Indicates any of the values in XrPerformanceMetricsCounterMETA is valid.
 	UINT_VALUE_VALID = 1, // Indicates the uintValue in XrPerformanceMetricsCounterMETA is valid.
@@ -947,7 +916,6 @@ FoveationModeHTC :: enum c.int {
 	CUSTOM = 3, // Allow application to set foveation with desired clear FOV, periphery quality, and focal center offset.
 }
 
-FoveationDynamicFlagsHTC :: distinct bit_set[FoveationDynamicFlagHTC; Flags64]
 FoveationDynamicFlagHTC :: enum Flags64 {
 	LEVEL_ENABLED = 0, // Allow system to set periphery pixel density dynamically.
 	CLEAR_FOV_ENABLED = 1, // Allow system to set clear FOV degree dynamically.
@@ -961,3 +929,36 @@ FoveationLevelHTC :: enum c.int {
 	HIGH = 3, // Heavy periphery pixel density drop and higher performance gain
 }
 
+InstanceCreateFlags :: distinct bit_set[InstanceCreateFlag; Flags64]
+SessionCreateFlags :: distinct bit_set[SessionCreateFlag; Flags64]
+SwapchainCreateFlags :: distinct bit_set[SwapchainCreateFlag; Flags64]
+SwapchainUsageFlags :: distinct bit_set[SwapchainUsageFlag; Flags64]
+ViewStateFlags :: distinct bit_set[ViewStateFlag; Flags64]
+CompositionLayerFlags :: distinct bit_set[CompositionLayerFlag; Flags64]
+SpaceLocationFlags :: distinct bit_set[SpaceLocationFlag; Flags64]
+SpaceVelocityFlags :: distinct bit_set[SpaceVelocityFlag; Flags64]
+InputSourceLocalizedNameFlags :: distinct bit_set[InputSourceLocalizedNameFlag; Flags64]
+VulkanInstanceCreateFlagsKHR :: distinct bit_set[VulkanInstanceCreateFlagKHR; Flags64]
+VulkanDeviceCreateFlagsKHR :: distinct bit_set[VulkanDeviceCreateFlagKHR; Flags64]
+DebugUtilsMessageSeverityFlagsEXT :: distinct bit_set[DebugUtilsMessageSeverityFlagEXT; Flags64]
+DebugUtilsMessageTypeFlagsEXT :: distinct bit_set[DebugUtilsMessageTypeFlagEXT; Flags64]
+OverlayMainSessionFlagsEXTX :: distinct bit_set[OverlayMainSessionFlagEXTX; Flags64]
+OverlaySessionCreateFlagsEXTX :: distinct bit_set[OverlaySessionCreateFlagEXTX; Flags64]
+AndroidSurfaceSwapchainFlagsFB :: distinct bit_set[AndroidSurfaceSwapchainFlagFB; Flags64]
+CompositionLayerImageLayoutFlagsFB :: distinct bit_set[CompositionLayerImageLayoutFlagFB; Flags64]
+CompositionLayerSecureContentFlagsFB :: distinct bit_set[CompositionLayerSecureContentFlagFB; Flags64]
+SwapchainCreateFoveationFlagsFB :: distinct bit_set[SwapchainCreateFoveationFlagFB; Flags64]
+SwapchainStateFoveationFlagsFB :: distinct bit_set[SwapchainStateFoveationFlagFB; Flags64]
+TriangleMeshFlagsFB :: distinct bit_set[TriangleMeshFlagFB; Flags64]
+PassthroughFlagsFB :: distinct bit_set[PassthroughFlagFB; Flags64]
+PassthroughStateChangedFlagsFB :: distinct bit_set[PassthroughStateChangedFlagFB; Flags64]
+PassthroughCapabilityFlagsFB :: distinct bit_set[PassthroughCapabilityFlagFB; Flags64]
+HandTrackingAimFlagsFB :: distinct bit_set[HandTrackingAimFlagFB; Flags64]
+KeyboardTrackingFlagsFB :: distinct bit_set[KeyboardTrackingFlagFB; Flags64]
+KeyboardTrackingQueryFlagsFB :: distinct bit_set[KeyboardTrackingQueryFlagFB; Flags64]
+CompositionLayerSpaceWarpInfoFlagsFB :: distinct bit_set[CompositionLayerSpaceWarpInfoFlagFB; Flags64]
+RenderModelFlagsFB :: distinct bit_set[RenderModelFlagFB; Flags64]
+DigitalLensControlFlagsALMALENCE :: distinct bit_set[DigitalLensControlFlagALMALENCE; Flags64]
+CompositionLayerSettingsFlagsFB :: distinct bit_set[CompositionLayerSettingsFlagFB; Flags64]
+PerformanceMetricsCounterFlagsMETA :: distinct bit_set[PerformanceMetricsCounterFlagMETA; Flags64]
+FoveationDynamicFlagsHTC :: distinct bit_set[FoveationDynamicFlagHTC; Flags64]
