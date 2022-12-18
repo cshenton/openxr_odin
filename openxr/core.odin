@@ -21,8 +21,16 @@ ControllerModelKeyMSFT  :: distinct Atom
 AsyncRequestIdFB        :: distinct Atom
 RenderModelKeyFB        :: distinct Atom
 
-SetProcAddressType :: #type proc(p: rawptr, name: cstring)
 
+// Function pointer types
+ProcSetProcAddress :: #type proc(p: rawptr, name: cstring)
+ProcVoidFunction :: #type proc "c" () -> rawptr
+ProcDebugUtilsMessengerCallbackEXT :: #type proc "c" (
+	messageSeverity: DebugUtilsMessageSeverityFlagsEXT,
+	messageTypes: DebugUtilsMessageTypeFlagsEXT,
+	callbackData: ^DebugUtilsMessengerCallbackDataEXT,
+	userData: rawptr,
+) -> rawptr
 // Base constants
 MAX_EXTENSION_NAME_SIZE :: 128
 MAX_API_LAYER_NAME_SIZE :: 256

@@ -86,8 +86,16 @@ ControllerModelKeyMSFT  :: distinct Atom
 AsyncRequestIdFB        :: distinct Atom
 RenderModelKeyFB        :: distinct Atom
 
-SetProcAddressType :: #type proc(p: rawptr, name: cstring)
 
+// Function pointer types
+ProcSetProcAddress :: #type proc(p: rawptr, name: cstring)
+ProcVoidFunction :: #type proc "c" () -> rawptr
+ProcDebugUtilsMessengerCallbackEXT :: #type proc "c" (
+	messageSeverity: DebugUtilsMessageSeverityFlagsEXT,
+	messageTypes: DebugUtilsMessageTypeFlagsEXT,
+	callbackData: ^DebugUtilsMessengerCallbackDataEXT,
+	userData: rawptr,
+) -> rawptr
 `
 
 // Generates the full core.odin file and writes it out
@@ -691,11 +699,51 @@ gen_procedures_odin :: proc(doc: ^xml.Document) {
 
 gen_procedures :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
 	for id in el.children {
-		el := doc.elements[id]
-		if el.ident != "command" {continue}
-		gen_procedure(builder, doc, el)
+		child_el := doc.elements[id]
+		if child_el.ident != "command" {continue}
+		gen_procedure_type(builder, doc, child_el)
+	}
+
+	strings.write_string(builder, "\n\n")
+
+	for id in el.children {
+		child_el := doc.elements[id]
+		if child_el.ident != "command" {continue}
+		gen_procedure(builder, doc, child_el)
 	}
 }
 
+gen_procedure_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	// Handle aliased commands special case. Just xrGetVulkanGraphicsRequirements2KHR as of writing
+	if el_has_attrib(el, "alias") { return }
+
+	// Function name and return type are in first child
+	proto_el := doc.elements[el.children[0]]
+	assert(proto_el.ident == "proto")
+	full_name := doc.elements[proto_el.children[1]].value
+	full_return_type := doc.elements[proto_el.children[0]].value
+	name := strings.trim_prefix(full_name, "xr")
+	return_type := strings.trim_prefix(full_return_type, "Xr")
+
+	strings.write_string(builder, fmt.aprintf("Proc{} :: #type proc() -> {}\n", name, return_type))
+}
+
 gen_procedure :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	// Handle aliased commands special case. Just xrGetVulkanGraphicsRequirements2KHR as of writing
+	if el_has_attrib(el, "alias") {
+		full_name := el_get_attrib(el, "name")
+		full_alias_name := el_get_attrib(el, "alias")
+		name := strings.trim_prefix(full_name, "xr")
+		alias_name := strings.trim_prefix(full_alias_name, "xr")
+		strings.write_string(builder, fmt.aprintf("{} : Proc{}\n", name, alias_name))
+		return
+	}
+
+	// Function name and return type are in first child
+	proto_el := doc.elements[el.children[0]]
+	assert(proto_el.ident == "proto")
+	full_name := doc.elements[proto_el.children[1]].value
+	name := strings.trim_prefix(full_name, "xr")
+
+	strings.write_string(builder, fmt.aprintf("{} : Proc{}\n", name, name))
 }
