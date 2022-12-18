@@ -88,7 +88,7 @@ RenderModelKeyFB        :: distinct Atom
 
 
 // Function pointer types
-ProcSetProcAddress :: #type proc(p: rawptr, name: cstring)
+ProcSetProcAddress :: #type proc "c" (p: rawptr, name: cstring)
 ProcVoidFunction :: #type proc "c" () -> rawptr
 ProcDebugUtilsMessengerCallbackEXT :: #type proc "c" (
 	messageSeverity: DebugUtilsMessageSeverityFlagsEXT,
@@ -475,7 +475,7 @@ gen_enums_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.El
 //                                               STRUCTS.ODIN                                                              //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-OS_TYPES :: `
+STRUCT_OS_TYPES :: `
 import "core:c"
 
 // Vulkan Types
@@ -560,7 +560,7 @@ gen_structs_odin :: proc(doc: ^xml.Document) {
 	builder := strings.builder_make()
 	strings.write_string(&builder, "package openxr\n\n")
 
-	strings.write_string(&builder, OS_TYPES)
+	strings.write_string(&builder, STRUCT_OS_TYPES)
 
 	for id in doc.elements[0].children {
 		el := doc.elements[id]
@@ -675,7 +675,7 @@ gen_struct_member :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml
 		name_str = NAME_ALIASES[name_str]
 	}
 
-	strings.write_string(builder, fmt.aprintf("\t{} : {},\n", name_str, type_str))
+	strings.write_string(builder, fmt.aprintf("\t{}: {},\n", name_str, type_str))
 }
 
 
@@ -683,10 +683,31 @@ gen_struct_member :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml
 //                                               PROCEDURES.ODIN                                                           //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+PROC_OS_TYPES :: `
+import "core:c"
+import "core:c/libc"
+
+// Vulkan Types
+import vk "vendor:vulkan"
+
+timespec :: libc.timespec
+wchar_t :: libc.wchar_t
+jobject :: rawptr
+
+when ODIN_OS == .Windows {
+	import win32 "core:sys/windows"
+        LARGE_INTEGER :: win32.LARGE_INTEGER
+} else {
+        LARGE_INTEGER :: distinct distinct c.longlong
+}
+
+`
+
 // Generates the full enums.odin file and writes it out
 gen_procedures_odin :: proc(doc: ^xml.Document) {
 	builder := strings.builder_make()
 	strings.write_string(&builder, "package openxr\n\n")
+	strings.write_string(&builder, PROC_OS_TYPES)
 
 	for id in doc.elements[0].children {
 		el := doc.elements[id]
@@ -715,7 +736,7 @@ gen_procedures :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.El
 
 gen_procedure_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
 	// Handle aliased commands special case. Just xrGetVulkanGraphicsRequirements2KHR as of writing
-	if el_has_attrib(el, "alias") { return }
+	if el_has_attrib(el, "alias") {return}
 
 	// Function name and return type are in first child
 	proto_el := doc.elements[el.children[0]]
@@ -725,7 +746,78 @@ gen_procedure_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xm
 	name := strings.trim_prefix(full_name, "xr")
 	return_type := strings.trim_prefix(full_return_type, "Xr")
 
-	strings.write_string(builder, fmt.aprintf("Proc{} :: #type proc() -> {}\n", name, return_type))
+	strings.write_string(builder, fmt.aprintf("Proc{} :: #type proc \"c\" (\n", name))
+	// The remaining children will be the function arguments
+	for id in el.children[1:] {
+		child_el := doc.elements[id]
+		if child_el.ident != "param" {continue}
+		gen_procedure_arg(builder, doc, doc.elements[id])
+	}
+
+	strings.write_string(builder, fmt.aprintf(") -> {}\n\n", return_type))
+}
+
+gen_procedure_arg :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
+	
+	type_str := doc.elements[el.children[0]].value
+	name_str := doc.elements[el.children[1]].value
+	
+	
+	// Apply alias and trim Xr prefix
+	if type_str in TYPE_ALIASES {
+		type_str = TYPE_ALIASES[type_str]
+	}
+	type_str = strings.trim_prefix(type_str, "Xr")
+	if strings.has_prefix(type_str, "PFN_xr") {
+		type_str = strings.trim_prefix(type_str, "PFN_xr")
+		type_str = fmt.aprintf("Proc{}", type_str)
+	}
+
+	// Handle Vk prefixes
+	if strings.has_prefix(type_str, "Vk") {
+		type_str = strings.trim_prefix(type_str, "Vk")
+		type_str = fmt.aprintf("vk.{}", type_str)
+	}
+	if strings.has_prefix(type_str, "PFN_vk") {
+		type_str = strings.trim_prefix(type_str, "PFN_vk")
+		type_str = fmt.aprintf("vk.Proc{}", type_str)
+	}
+
+	// Handle Arrayness
+	if strings.contains(el.value, "[") || strings.contains(el.value, "]") {
+		type_str = fmt.aprintf("[^]{}", type_str)
+	}
+
+	// Handle Pointerness / char* ness
+	ptr_count := strings.count(el.value, "*")
+	if ptr_count == 1 {
+		if type_str == "char" {
+			type_str = "cstring"
+		} else {
+			type_str = fmt.aprintf("^{}", type_str)
+		}
+	}
+	if ptr_count == 2 {
+		if type_str == "char" {
+			type_str = "[^]cstring"
+		} else {
+			type_str = fmt.aprintf("^^{}", type_str)
+		}
+	}
+
+	if strings.has_suffix(type_str, "char") {
+		type_str = fmt.aprintf("{}u8", strings.trim_suffix(type_str, "char"))
+	}
+
+	// Now handle void pointers
+	if type_str == "^void" {
+		type_str = "rawptr"
+	}
+	if type_str == "^^void" {
+		type_str = "^rawptr"
+	}
+
+	strings.write_string(builder, fmt.aprintf("\t{}: {},\n", name_str, type_str))
 }
 
 gen_procedure :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
@@ -735,7 +827,7 @@ gen_procedure :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Ele
 		full_alias_name := el_get_attrib(el, "alias")
 		name := strings.trim_prefix(full_name, "xr")
 		alias_name := strings.trim_prefix(full_alias_name, "xr")
-		strings.write_string(builder, fmt.aprintf("{} : Proc{}\n", name, alias_name))
+		strings.write_string(builder, fmt.aprintf("{}: Proc{}\n", name, alias_name))
 		return
 	}
 
@@ -745,5 +837,5 @@ gen_procedure :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Ele
 	full_name := doc.elements[proto_el.children[1]].value
 	name := strings.trim_prefix(full_name, "xr")
 
-	strings.write_string(builder, fmt.aprintf("{} : Proc{}\n", name, name))
+	strings.write_string(builder, fmt.aprintf("{}: Proc{}\n", name, name))
 }

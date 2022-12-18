@@ -23,7 +23,7 @@ RenderModelKeyFB        :: distinct Atom
 
 
 // Function pointer types
-ProcSetProcAddress :: #type proc(p: rawptr, name: cstring)
+ProcSetProcAddress :: #type proc "c" (p: rawptr, name: cstring)
 ProcVoidFunction :: #type proc "c" () -> rawptr
 ProcDebugUtilsMessengerCallbackEXT :: #type proc "c" (
 	messageSeverity: DebugUtilsMessageSeverityFlagsEXT,
