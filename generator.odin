@@ -21,10 +21,6 @@ main :: proc() {
 		return
 	}
 
-	// Write loader
-	// TODO: Link GetInstanceProcAddress
-	// TODO: Gather all instance, device functions and write procs to load in fn pointers
-
 	gen_core_odin(doc)
 	gen_enums_odin(doc)
 	gen_structs_odin(doc)
@@ -244,6 +240,7 @@ gen_enums_odin :: proc(doc: ^xml.Document) {
 	os.write_entire_file("openxr/enums.odin", builder.buf[:])
 }
 
+// Builds a map of extended enum values from the <extensions> element
 get_enum_extensions :: proc(doc: ^xml.Document, el: xml.Element) -> (ext_map: map[string][dynamic]Extended_Enum) {
 	for id in el.children {
 		get_enum_extension(doc, doc.elements[id], &ext_map)
@@ -252,6 +249,7 @@ get_enum_extensions :: proc(doc: ^xml.Document, el: xml.Element) -> (ext_map: ma
 	return ext_map
 }
 
+// Finds extended enum values from a single <extension> element
 get_enum_extension :: proc(doc: ^xml.Document, el: xml.Element, ext_map: ^map[string][dynamic]Extended_Enum) {
 	ext_number, ok := strconv.parse_int(el_get_attrib(el, "number"), 10)
 	assert(ok)
@@ -339,6 +337,7 @@ gen_enums_enum :: proc(
 	strings.write_string(builder, "}\n\n")
 }
 
+// Generates code for a single value in an enum declaration
 gen_enums_enum_value :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element, prefix, suffix: string) {
 	if el.ident != "enum" {
 		return
@@ -355,6 +354,7 @@ gen_enums_enum_value :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: 
 	strings.write_string(builder, "\n")
 }
 
+// Generates code for a single extension value in an enum declaration
 gen_enums_enum_extended :: proc(builder: ^strings.Builder, ext_enum: Extended_Enum, prefix, suffix: string) {
 	name := strings.trim_prefix(strings.trim_suffix(ext_enum.name, suffix), prefix)
 	value := ext_enum.value
@@ -383,6 +383,7 @@ gen_enums_bitfield :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xm
 	strings.write_string(builder, "}\n\n")
 }
 
+// Generates code for a single value in a bitfield
 gen_enums_bitfield_value :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element, prefix, suffix: string) {
 	if el.ident != "enum" {
 		return
@@ -462,6 +463,7 @@ gen_enums_types :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.E
 	}
 }
 
+// Generates code for an enum bitset type
 gen_enums_type :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
 	category, ok := el_try_get_attrib(el, "category")
 	if category != "bitmask" {return}
@@ -573,6 +575,7 @@ gen_structs_odin :: proc(doc: ^xml.Document) {
 	os.write_entire_file("openxr/structs.odin", builder.buf[:])
 }
 
+// Generates struct declaration code from the <types> element
 gen_struct_types :: proc(builder: ^strings.Builder, doc: ^xml.Document, el: xml.Element) {
 	for id in el.children {
 		el := doc.elements[id]
